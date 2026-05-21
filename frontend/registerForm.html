@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация - QuizHub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .register-card {
+            background: rgba(255, 255, 255, 0.97);
+            border-radius: 25px;
+            padding: 50px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+            padding-left: 5px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f9f9f9;
+            color: #333;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #aaa;
+        }
+
+        .error-message {
+            background: linear-gradient(45deg, #ff6b6b, #ff5252);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            font-weight: 600;
+            text-align: center;
+            animation: slideIn 0.3s ease-out;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 15px;
+        }
+
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            padding: 5px 10px;
+            border-radius: 8px;
+        }
+
+        .login-link a:hover {
+            color: #764ba2;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .password-strength {
+            margin-top: 8px;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(45deg, #ff6b6b, #4CAF50);
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .password-hint {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+            padding-left: 5px;
+        }
+
+        .submit-btn.loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .submit-btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            border: 3px solid white;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 500px) {
+            .register-card {
+                padding: 35px 25px;
+            }
+
+            .title {
+                font-size: 28px;
+            }
+
+            .form-input {
+                padding: 14px 18px;
+            }
+
+            .submit-btn {
+                padding: 16px;
+            }
+        }
+
+        .form-input:focus + .form-label {
+            color: #667eea;
+        }
+
+        .decoration {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            z-index: -1;
+        }
+
+        .decoration:nth-child(1) {
+            top: 10%;
+            right: 10%;
+        }
+
+        .decoration:nth-child(2) {
+            bottom: 10%;
+            left: 10%;
+        }
+    </style>
+</head>
+<body>
+<div class="decoration"></div>
+<div class="decoration"></div>
+
+<div class="container">
+    <div class="register-card">
+        <div class="logo-section">
+            <a href="/" class="logo">
+                <div class="logo-icon">Q</div>
+                <div class="logo-text">QuizHub</div>
+            </a>
+        </div>
+
+        <h1 class="title">Создать аккаунт</h1>
+        <br><br>
+
+        {{if .Error}}
+        <div class="error-message">
+            {{.Error}}
+        </div>
+        {{end}}
+
+        <form method="post" action="/register" id="registerForm">
+            <div class="form-group">
+                <label class="form-label" for="username">Имя пользователя</label>
+                <input type="text"
+                       id="username"
+                       name="username"
+                       class="form-input"
+                       placeholder="Введите имя пользователя"
+                       required
+                       oninput="validateUsername()">
+                <div class="password-hint">Можно использовать буквы, цифры и символы подчеркивания</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Пароль</label>
+                <input type="password"
+                       id="password"
+                       name="password"
+                       class="form-input"
+                       placeholder="Введите пароль"
+                       required
+                       oninput="checkPasswordStrength()">
+                <div class="password-strength">
+                    <div class="strength-fill" id="strengthFill"></div>
+                </div>
+                <div class="password-hint">Пароль должен содержать не менее 6 символов</div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">
+                Зарегистрироваться
+            </button>
+        </form>
+
+        <div class="login-link">
+            Уже есть аккаунт? <a href="/login">Войти</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function validateUsername() {
+        const username = document.getElementById('username');
+        const value = username.value.trim();
+
+        if (value.length < 3) {
+            username.style.borderColor = '#ff6b6b';
+            return false;
+        }
+        const validPattern = /^[a-zA-Z0-9_]+$/;
+        if (!validPattern.test(value)) {
+            username.style.borderColor = '#ff6b6b';
+            return false;
+        }
+
+        username.style.borderColor = '#4CAF50';
+        return true;
+    }
+
+    function checkPasswordStrength() {
+        const password = document.getElementById('password').value;
+        const strengthFill = document.getElementById('strengthFill');
+
+        let strength = 0;
+
+        if (password.length >= 8) strength += 25;
+        if (password.length >= 12) strength += 25;
+        if (/\d/.test(password)) strength += 25;
+        if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength += 15;
+        if (/[^a-zA-Z0-9]/.test(password)) strength += 10;
+        strength = Math.min(strength, 100);
+        strengthFill.style.width = strength + '%';
+
+        if (strength < 40) {
+            strengthFill.style.background = 'linear-gradient(45deg, #ff6b6b, #ff5252)';
+        } else if (strength < 70) {
+            strengthFill.style.background = 'linear-gradient(45deg, #FFA726, #FF9800)';
+        } else {
+            strengthFill.style.background = 'linear-gradient(45deg, #4CAF50, #45a049)';
+        }
+    }
+
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+        const submitBtn = document.getElementById('submitBtn');
+        const username = document.getElementById('username');
+        const password = document.getElementById('password');
+
+        if (!validateUsername()) {
+            e.preventDefault();
+            alert('Имя пользователя должно содержать только буквы, цифры и символы подчеркивания, и содержать не менее 3 символов');
+            username.focus();
+            return;
+        }
+
+        if (password.value.length < 6) {
+            e.preventDefault();
+            alert('Пароль должен быть не менее 6 символов');
+            password.focus();
+            return;
+        }
+
+        submitBtn.classList.add('loading');
+        submitBtn.disabled = true;
+
+        setTimeout(() => {
+            submitBtn.classList.remove('loading');
+            submitBtn.disabled = false;
+        }, 2000);
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('username').focus();
+    });
+
+    document.getElementById('username').addEventListener('blur', validateUsername);
+    document.getElementById('password').addEventListener('blur', function() {
+        if (this.value.length < 6) {
+            this.style.borderColor = '#ff6b6b';
+        } else {
+            this.style.borderColor = '#4CAF50';
+        }
+    });
+
+    checkPasswordStrength();
+</script>
+</body>
+</html>

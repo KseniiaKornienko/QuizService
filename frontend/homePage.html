@@ -1,0 +1,1754 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>QuizHub - Главная</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--    <script src="/js/homePage.js" defer></script>-->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .auth-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .login-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .logout-btn {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .logout-btn:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        .username {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .search-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .search-subtitle {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .search-form {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .search-form {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+        }
+
+        .filter-btn {
+            position: absolute;
+            right: 70px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid #e0e0e0;
+            background: white;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.12);
+        }
+
+        .filter-popover {
+            position: absolute;
+            right: 70px;
+            top: calc(100% + 10px);
+            width: 280px;
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 16px;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+            padding: 12px;
+            display: none;
+            z-index: 50;
+        }
+
+        .filter-popover.open {
+            display: block;
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 12px 12px;
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+            background: #f9f9f9;
+            font-size: 14px;
+        }
+
+        .filter-apply-btn {
+            width: 100%;
+            margin-top: 10px;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: #fff;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+
+        .search-input {
+            width: 100%;
+            padding: 18px 25px;
+            padding-right: 130px;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 18px;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .quizzes-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 30px;
+            text-align: center;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .quizzes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .quiz-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .quiz-card:hover {
+            transform: translateY(-10px);
+            border-color: #667eea;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .quiz-category {
+            display: inline-block;
+            padding: 6px 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .quiz-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+
+        .quiz-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .quiz-mode-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: -4px 0 14px 0;
+        }
+
+        .quiz-mode-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            border: 1px solid rgba(15, 23, 42, 0.10);
+            background: rgba(255, 255, 255, 0.75);
+            color: #334155;
+        }
+
+        .quiz-mode-badge .mode-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background: currentColor;
+            opacity: 0.55;
+        }
+
+        .quiz-mode-badge.mode-individual {
+            background: rgba(102, 126, 234, 0.10);
+            border-color: rgba(102, 126, 234, 0.28);
+            color: #4338ca;
+        }
+
+        .quiz-mode-badge.mode-team {
+            background: rgba(16, 185, 129, 0.10);
+            border-color: rgba(16, 185, 129, 0.28);
+            color: #047857;
+        }
+
+        .quiz-author {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #888;
+            font-size: 14px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .quiz-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .take-quiz-btn {
+            padding: 12px 22px;
+            border-radius: 999px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            border: 2px solid rgba(102, 126, 234, 0.35);
+            color: #4a5568;
+            background: white;
+            transition: all 0.25s ease;
+            cursor: pointer;
+        }
+
+        .take-quiz-btn:hover {
+            transform: translateY(-2px);
+            border-color: rgba(102, 126, 234, 0.55);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+        }
+
+        .author-icon {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+
+        .quiz-privacy {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: 10px;
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            background: #f0f0f0;
+        }
+
+        .public {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .private {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .profile-menu {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .profile-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid rgba(102, 126, 234, 0.25);
+            background: rgba(255, 255, 255, 0.9);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        .profile-btn:hover {
+            transform: translateY(-2px);
+            border-color: rgba(102, 126, 234, 0.45);
+        }
+
+        .profile-btn .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            font-weight: 800;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: calc(100% + 12px);
+            right: 0;
+            width: 240px;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+            overflow: hidden;
+            transform: translateY(-6px);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s ease;
+            z-index: 20;
+        }
+
+        .profile-dropdown.open {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .profile-dropdown .drop-header {
+            padding: 18px 18px 14px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.12), rgba(118, 75, 162, 0.12));
+        }
+
+        .profile-dropdown .hello {
+            font-size: 14px;
+            color: #4a5568;
+            margin-bottom: 4px;
+        }
+
+        .profile-dropdown .drop-body {
+            padding: 12px 10px;
+        }
+
+        .profile-dropdown .drop-item {
+            display: block;
+            padding: 12px 12px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 600;
+            transition: background 0.2s ease;
+        }
+
+        .profile-dropdown .drop-item:hover {
+            background: rgba(102, 126, 234, 0.10);
+        }
+
+        .profile-dropdown .drop-submenu {
+            margin-top: 4px;
+        }
+
+        .profile-dropdown .drop-item-btn {
+            width: 100%;
+            background: transparent;
+            border: none;
+
+            padding: 12px 12px;
+            border-radius: 12px;
+            color: #333;
+            font-weight: 600;
+
+            font-family: inherit;
+            font-size: inherit;
+            line-height: inherit;
+
+            text-align: left;
+            cursor: pointer;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .profile-dropdown .drop-item-btn:hover {
+            background: rgba(102, 126, 234, 0.10);
+        }
+
+        .profile-dropdown .drop-submenu .chev {
+            opacity: 0.7;
+            font-weight: 800;
+            transition: transform 0.2s ease;
+        }
+
+        .profile-dropdown .drop-submenu.open .chev {
+            transform: rotate(180deg);
+        }
+
+        .profile-dropdown .submenu {
+            display: none;
+            padding: 6px 6px 0;
+        }
+
+        .profile-dropdown .drop-submenu.open .submenu {
+            display: block;
+        }
+
+        .profile-dropdown .drop-item.sub-item {
+            padding: 10px 12px;
+            margin-left: 6px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .profile-dropdown .drop-item.sub-item:hover {
+            background: rgba(102, 126, 234, 0.12);
+        }
+
+        .create-quiz-section {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .create-quiz-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 18px 40px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .create-quiz-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.5);
+        }
+
+        .plus-icon {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .logo {
+                justify-content: center;
+            }
+
+            .search-title {
+                font-size: 28px;
+            }
+
+            .search-subtitle {
+                font-size: 16px;
+            }
+
+            .quizzes-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quiz-card {
+                padding: 20px;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 100;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal {
+            width: 100%;
+            max-width: 520px;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 22px;
+            box-shadow: 0 22px 60px rgba(0, 0, 0, 0.22);
+            overflow: hidden;
+            animation: fadeIn 0.18s ease-out;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 18px;
+            padding: 22px 22px 16px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.10), rgba(118, 75, 162, 0.10));
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #2d3748;
+            margin: 0;
+        }
+
+        .modal-subtitle {
+            color: #666;
+            margin-top: 6px;
+            font-size: 14px;
+        }
+
+        .modal-close {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            background: rgba(255, 255, 255, 0.75);
+            cursor: pointer;
+            font-size: 22px;
+            line-height: 36px;
+            font-weight: 800;
+            color: #4a5568;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .modal-body {
+            padding: 20px 22px 22px;
+        }
+
+        .modal-alert {
+            padding: 12px 14px;
+            border-radius: 12px;
+            margin-bottom: 14px;
+            color: #fff;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .modal-alert.error {
+            background: linear-gradient(45deg, #ff6b6b, #ff5252);
+        }
+
+        .modal-alert.success {
+            background: linear-gradient(45deg, #48bb78, #38a169);
+        }
+
+        .modal-form .form-group {
+            margin-bottom: 14px;
+        }
+
+        .modal-form label {
+            display: block;
+            font-size: 14px;
+            font-weight: 700;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .modal-form input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 14px;
+            background: #f9f9f9;
+            font-size: 16px;
+        }
+
+        .modal-form input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.12);
+        }
+
+        .modal-hint {
+            font-size: 12px;
+            color: #888;
+            margin-top: 6px;
+        }
+
+        .modal-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .modal-btn:disabled {
+            opacity: 0.7;
+            cursor: default;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        button.drop-item {
+            width: 100%;
+            border: none;
+            background: transparent;
+            text-align: left;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        .name-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(20, 20, 35, 0.45);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+            animation: fadeInNameModalBg 0.18s ease;
+        }
+
+        .name-modal-overlay.open {
+            display: flex;
+        }
+
+        .name-modal {
+            width: 100%;
+            max-width: 440px;
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 20px;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.18);
+            overflow: hidden;
+            animation: popInNameModal 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .name-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+
+        .name-modal-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .name-modal-close {
+            border: none;
+            background: rgba(255, 255, 255, 0.18);
+            color: #fff;
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 22px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s ease, transform 0.15s ease;
+        }
+
+        .name-modal-close:hover {
+            background: rgba(255, 255, 255, 0.28);
+            transform: scale(1.03);
+        }
+
+        .name-modal-body {
+            padding: 18px;
+        }
+
+        .name-modal-subtitle {
+            margin: 0 0 12px 0;
+            color: #5f6472;
+            font-size: 14px;
+        }
+
+        .name-modal-input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #d9deea;
+            border-radius: 12px;
+            outline: none;
+            font-size: 15px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            background: #fff;
+        }
+
+        .name-modal-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.12);
+        }
+
+        .name-modal-input.input-error {
+            border-color: rgba(239, 68, 68, 0.55);
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.08);
+        }
+
+        .name-modal-error {
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: rgba(239, 68, 68, 0.08);
+            color: #c62828;
+            font-size: 13px;
+            border: 1px solid rgba(239, 68, 68, 0.15);
+            display: none;
+        }
+
+        .name-modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding: 0 18px 18px 18px;
+        }
+
+        .name-modal-btn {
+            border: none;
+            border-radius: 12px;
+            padding: 10px 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+        }
+
+        .name-modal-btn.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 8px 18px rgba(102, 126, 234, 0.25);
+        }
+
+        .name-modal-btn.primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .name-modal-btn.secondary {
+            background: #eef1f7;
+            color: #374151;
+        }
+
+        .name-modal-btn.secondary:hover {
+            background: #e6ebf4;
+            transform: translateY(-1px);
+        }
+
+        @keyframes fadeInNameModalBg {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes popInNameModal {
+            from {
+                opacity: 0;
+                transform: translateY(8px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+    </style>
+
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <a href="/" class="logo">
+            <div class="logo-icon">Q</div>
+            <div class="logo-text">QuizHub</div>
+        </a>
+
+        <div class="user-menu">
+            {{if .IsLoggedIn}}
+            <a href="/logout" class="auth-btn logout-btn">Выйти</a>
+            <div class="profile-menu">
+                <button class="profile-btn" id="profileBtn" type="button" aria-haspopup="true" aria-expanded="false">
+                    <div class="avatar">
+                        <span id="avatarInitial">{{printf "%.1s" .Username}}</span>
+                    </div>
+                </button>
+
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="drop-header">
+                        <div class="hello">Привет, <span id="headerUsername">{{.Username}}</span></div>
+                    </div>
+
+                    <div class="drop-body">
+                        {{if .IsLoggedIn}}
+                        <a class="drop-item" id="myQuizzesLink" href="/my-quizzes/{{.Username}}">Мои квизы</a>
+                        <a class="drop-item" id="questionBankLink" href="/question-bank/{{.Username}}">Банк вопросов</a>
+                        <a class="drop-item" id="historyLink" href="/history/{{.Username}}">История</a>
+                        <div class="drop-submenu" id="profileSettings">
+                            <button class="drop-item drop-item-btn" id="profileSettingsBtn" type="button"
+                                    aria-haspopup="true" aria-expanded="false">
+                                <span>Настройки профиля</span>
+                                <span class="chev">▾</span>
+                            </button>
+
+                            <div class="submenu" id="profileSettingsMenu">
+                                <button class="drop-item sub-item" type="button" id="openChangeUsername">Изменить имя
+                                    пользователя
+                                </button>
+                                <button class="drop-item sub-item" type="button" id="openChangePassword">Изменить
+                                    пароль
+                                </button>
+                            </div>
+                        </div>
+
+                        <a class="drop-item" href="/logout">Выйти</a>
+                        {{else}}
+                        <a class="drop-item" href="/login">Войти</a>
+                        <a class="drop-item" href="/register">Регистрация</a>
+                        {{end}}
+                    </div>
+                </div>
+            </div>
+            {{else}}
+            <a href="/login" class="auth-btn login-btn">Войти</a>
+            <a href="/register" class="auth-btn logout-btn">Регистрация</a>
+            {{end}}
+        </div>
+    </header>
+
+    <section class="search-section">
+        <h1 class="search-title">Поиск квиза</h1>
+        <p class="search-subtitle">Искать квизы по названию, автору или коду</p>
+        <form class="search-form" method="GET" action="/">
+            <input
+                    type="text"
+                    class="search-input"
+                    name="q"
+                    value="{{.SearchQuery}}"
+                    placeholder="Название, автор или ID (например: 12)"
+            >
+
+            <button type="button" class="filter-btn" id="filterToggle" aria-label="Фильтр по категории">
+                ☰
+            </button>
+
+            <button type="submit" class="search-btn" aria-label="Поиск">
+                🔍
+            </button>
+
+            <div class="filter-popover" id="filterPopover" aria-hidden="true">
+                <select name="category" class="filter-select">
+                    <option value="all" {{if eq .SelectedCategory
+                    "all"}}selected{{end}}>Все категории</option>
+                    <option value="language_quiz" {{if eq .SelectedCategory
+                    "language_quiz"}}selected{{end}}>Языковой</option>
+                    <option value="math_quiz" {{if eq .SelectedCategory
+                    "math_quiz"}}selected{{end}}>Математика</option>
+                    <option value="astronomy_quiz" {{if eq .SelectedCategory
+                    "astronomy_quiz"}}selected{{end}}>Астрономия</option>
+                </select>
+                <button type="submit" class="filter-apply-btn">Применить</button>
+            </div>
+        </form>
+
+
+    </section>
+
+    <section class="quizzes-section">
+        <h2 class="section-title">Каталог квизов</h2>
+
+
+        <div class="quizzes-grid">
+            {{range .Quizzes}}
+            <div class="quiz-card">
+                <div class="quiz-card-content">
+                    <div class="quiz-category">
+                        {{if eq .Category "language_quiz"}}Языковой
+                        {{else if eq .Category "math_quiz"}}Математика
+                        {{else if eq .Category "astronomy_quiz"}}Астрономия
+                        {{else}}{{.Category}}{{end}}
+                        <span class="quiz-privacy {{.Privacy}}">
+                            {{if eq .Privacy "public"}}Публичный{{else}}Приватный{{end}}
+                        </span>
+                    </div>
+
+                    <h3 class="quiz-title">{{.Title}}</h3>
+                    <div class="quiz-mode-row">
+                        <span class="quiz-mode-badge {{if eq .ParticipationMode "individual"}}mode-individual{{else}}mode-team{{end}}">
+                        <span class="mode-dot" aria-hidden="true"></span>
+                        {{if eq .ParticipationMode "individual"}}Индивидуальный{{else}}Командный{{end}}
+                        </span>
+                    </div>
+                    <p class="quiz-description">{{.Description}}</p>
+
+                    <div class="quiz-author">
+                        <div class="author-icon">👤</div>
+                        <span>Автор: <strong>{{if .Author}}{{.Author}}{{else}}Аноним{{end}}</strong>
+                            <span style="margin-left:10px; opacity:0.8;">ID: <strong>{{.Id}}</strong></span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="quiz-actions">
+                    <a href="#" class="auth-btn login-btn" onclick="startQuizFlow(event, '{{.Id}}', '{{.Privacy}}', '{{.ParticipationMode}}', '{{.TeamCount}}')">Пройти квиз</a>
+                    <!--                    <a class="take-quiz-btn" href="/quiz/{{.Id}}?take=1">Пройти</a>-->
+                </div>
+            </div>
+            {{else}}
+            <div class="quiz-card" style="text-align: center; grid-column: 1 / -1;">
+                <h3 class="quiz-title">Квизов пока нет</h3>
+                <p class="quiz-description">Будьте первым, кто создаст интересный квиз!</p>
+            </div>
+            {{end}}
+        </div>
+    </section>
+
+    {{if .IsLoggedIn}}
+    <section class="create-quiz-section">
+        <a href="/edit-quiz?mode=new" class="create-quiz-btn">
+            <span class="plus-icon">+</span>
+            Создать новый квиз
+        </a>
+    </section>
+    {{end}}
+
+    <footer class="footer">
+        <p>© 2026 QuizHub. Корниенко Ксения</p>
+    </footer>
+</div>
+
+{{if .IsLoggedIn}}
+<div class="modal-overlay" id="profileModalOverlay" aria-hidden="true">
+    <div class="modal" id="profileModal" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
+        <div class="modal-header">
+            <div>
+                <h2 class="modal-title" id="profileModalTitle">Настройки профиля</h2>
+                <div class="modal-subtitle">Пользователь: <strong id="usernameInModal">{{.Username}}</strong></div>
+            </div>
+            <button class="modal-close" id="profileModalClose" type="button" aria-label="Закрыть">×</button>
+        </div>
+
+        <div class="modal-body">
+            <div class="modal-alert" id="profileModalAlert" style="display:none"></div>
+
+            <form class="modal-form" id="changeUsernameForm" method="post" action="/profile/change-username"
+                  style="display:none">
+                <div class="form-group">
+                    <label for="modal_new_username">Новое имя пользователя</label>
+                    <input id="modal_new_username" name="new_username" required pattern="[a-zA-Z0-9_]{3,}"
+                           autocomplete="username">
+                    <div class="modal-hint">Минимум 3 символа, только латинские буквы, цифры и _</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="modal_username_password">Текущий пароль</label>
+                    <input id="modal_username_password" type="password" name="password" required
+                           autocomplete="current-password">
+                </div>
+
+                <button class="modal-btn" id="changeUsernameSubmit" type="submit">Сохранить</button>
+            </form>
+
+            <form class="modal-form" id="changePasswordForm" method="post" action="/profile/change-password"
+                  style="display:none">
+                <div class="form-group">
+                    <label for="modal_current_password">Текущий пароль</label>
+                    <input id="modal_current_password" type="password" name="current_password" required
+                           autocomplete="current-password">
+                </div>
+
+                <div class="form-group">
+                    <label for="modal_new_password">Новый пароль</label>
+                    <input id="modal_new_password" type="password" name="new_password" required
+                           autocomplete="new-password">
+                    <div class="modal-hint">Минимум 6 символов</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="modal_confirm_password">Повторите новый пароль</label>
+                    <input id="modal_confirm_password" type="password" name="confirm_password" required
+                           autocomplete="new-password">
+                </div>
+
+                <button class="modal-btn" id="changePasswordSubmit" type="submit">Сохранить</button>
+            </form>
+        </div>
+    </div>
+</div>
+{{end}}
+
+
+
+<!-- Модалка ввода приватного ключа -->
+<div id="privateKeyModalOverlay" class="name-modal-overlay" aria-hidden="true">
+    <div class="name-modal" role="dialog" aria-modal="true" aria-labelledby="privateKeyModalTitle">
+        <div class="name-modal-header">
+            <h3 id="privateKeyModalTitle">Введите приватный ключ</h3>
+            <button type="button" class="name-modal-close" onclick="closePrivateKeyModal()" aria-label="Закрыть">×</button>
+        </div>
+        <div class="name-modal-body">
+            <p class="name-modal-subtitle">Этот квиз доступен только по ключу</p>
+            <input id="privateKeyInput" class="name-modal-input" type="password" maxlength="128" placeholder="Приватный ключ" autocomplete="off" />
+            <div id="privateKeyError" class="name-modal-error">Пожалуйста, введите приватный ключ.</div>
+        </div>
+        <div class="name-modal-actions">
+            <button type="button" class="name-modal-btn secondary" onclick="closePrivateKeyModal()">Отмена</button>
+            <button type="button" class="name-modal-btn primary" onclick="submitPrivateKeyModal()">Далее</button>
+        </div>
+    </div>
+</div>
+
+<!-- Модалка ввода имени участника -->
+<div id="nameModalOverlay" class="name-modal-overlay" aria-hidden="true">
+    <div class="name-modal" role="dialog" aria-modal="true" aria-labelledby="nameModalTitle">
+        <div class="name-modal-header">
+            <h3 id="nameModalTitle">Введите имя</h3>
+            <button type="button" class="name-modal-close" onclick="closeNameModal()" aria-label="Закрыть">×</button>
+        </div>
+        <div class="name-modal-body">
+            <p id="nameModalSubtitle" class="name-modal-subtitle">Укажите имя, чтобы начать квиз</p>
+            <input id="playerNameInput" class="name-modal-input" type="text" maxlength="64" placeholder="Например: John Johnson" />
+            <div id="playerNameError" class="name-modal-error">Пожалуйста, введите имя.</div>
+            <div id="teamNameFieldWrap" style="display:none; margin-top:14px;">
+                <input id="teamNameInput" class="name-modal-input" type="text" maxlength="64" placeholder="Название команды" />
+                <div id="teamNameError" class="name-modal-error">Пожалуйста, введите название команды.</div>
+            </div>
+        </div>
+        <div class="name-modal-actions">
+            <button type="button" class="name-modal-btn secondary" onclick="closeNameModal()">Отмена</button>
+            <button type="button" class="name-modal-btn primary" onclick="submitNameModal()">Начать</button>
+        </div>
+    </div>
+</div>
+
+</body>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const cards = document.querySelectorAll('.quiz-card');
+        cards.forEach((card, index) => {
+            card.style.animationDelay = (index * 0.1) + 's';
+        });
+    });
+
+    const cards = document.querySelectorAll('.quiz-card');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function () {
+            this.style.transform = 'translateY(-10px)';
+        });
+
+        card.addEventListener('mouseleave', function () {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+
+    (function () {
+        const btn = document.getElementById('profileBtn');
+        const dd = document.getElementById('profileDropdown');
+
+        const settingsWrap = document.getElementById('profileSettings');
+        const settingsBtn = document.getElementById('profileSettingsBtn');
+
+        if (!btn || !dd) return;
+
+        const close = () => {
+            dd.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
+            if (settingsWrap) settingsWrap.classList.remove('open');
+        };
+
+        const toggle = () => {
+            const isOpen = dd.classList.contains('open');
+            if (isOpen) close();
+            else {
+                dd.classList.add('open');
+                btn.setAttribute('aria-expanded', 'true');
+            }
+        };
+
+        btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            toggle();
+        });
+
+        dd.addEventListener('click', function (e) {
+            e.stopPropagation();
+        });
+
+        if (settingsBtn && settingsWrap) {
+            settingsBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                settingsWrap.classList.toggle('open');
+            });
+        }
+
+        document.addEventListener('click', function () {
+            close();
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') close();
+        });
+    })();
+
+    (function () {
+        const overlay = document.getElementById('profileModalOverlay');
+        const modal = document.getElementById('profileModal');
+        const closeBtn = document.getElementById('profileModalClose');
+        const openUsernameBtn = document.getElementById('openChangeUsername');
+        const openPasswordBtn = document.getElementById('openChangePassword');
+
+        if (!overlay || !modal) return;
+
+        const titleEl = document.getElementById('profileModalTitle');
+        const alertEl = document.getElementById('profileModalAlert');
+        const usernameInModal = document.getElementById('usernameInModal');
+
+        const formUsername = document.getElementById('changeUsernameForm');
+        const formPassword = document.getElementById('changePasswordForm');
+
+        const submitUsernameBtn = document.getElementById('changeUsernameSubmit');
+        const submitPasswordBtn = document.getElementById('changePasswordSubmit');
+
+        const profileBtn = document.getElementById('profileBtn');
+        const profileDropdown = document.getElementById('profileDropdown');
+        const profileSettingsWrap = document.getElementById('profileSettings');
+
+        const headerUsername = document.getElementById('headerUsername');
+        const avatarInitial = document.getElementById('avatarInitial');
+        const myQuizzesLink = document.getElementById('myQuizzesLink');
+        const questionBankLink = document.getElementById('questionBankLink');
+        const historyLink = document.getElementById('historyLink');
+
+
+        const resetAlert = () => {
+            if (!alertEl) return;
+            alertEl.style.display = 'none';
+            alertEl.textContent = '';
+            alertEl.classList.remove('error', 'success');
+        };
+
+        const showAlert = (type, text) => {
+            if (!alertEl) return;
+            alertEl.textContent = text;
+            alertEl.classList.remove('error', 'success');
+            alertEl.classList.add(type);
+            alertEl.style.display = 'block';
+        };
+
+        const open = (mode) => {
+            resetAlert();
+            if (profileDropdown) profileDropdown.classList.remove('open');
+            if (profileBtn) profileBtn.setAttribute('aria-expanded', 'false');
+            if (profileSettingsWrap) profileSettingsWrap.classList.remove('open');
+
+            overlay.classList.add('open');
+            overlay.setAttribute('aria-hidden', 'false');
+
+            if (formUsername) formUsername.style.display = mode === 'username' ? 'block' : 'none';
+            if (formPassword) formPassword.style.display = mode === 'password' ? 'block' : 'none';
+
+            if (titleEl) titleEl.textContent = mode === 'username' ? 'Сменить имя пользователя' : 'Сменить пароль';
+            if (usernameInModal && headerUsername) usernameInModal.textContent = headerUsername.textContent;
+
+            if (mode === 'username' && formUsername) {
+                formUsername.reset();
+                const newU = document.getElementById('modal_new_username');
+                if (newU) newU.focus();
+            }
+            if (mode === 'password' && formPassword) {
+                formPassword.reset();
+                const curP = document.getElementById('modal_current_password');
+                if (curP) curP.focus();
+            }
+        };
+
+        const close = () => {
+            overlay.classList.remove('open');
+            overlay.setAttribute('aria-hidden', 'true');
+            resetAlert();
+        };
+
+        const updateUsernameEverywhere = (newUsername) => {
+            if (headerUsername) headerUsername.textContent = newUsername;
+            if (usernameInModal) usernameInModal.textContent = newUsername;
+            if (avatarInitial) avatarInitial.textContent = (newUsername || '').substring(0, 1);
+            if (myQuizzesLink) myQuizzesLink.setAttribute('href', '/my-quizzes/' + newUsername);
+            if (questionBankLink) questionBankLink.setAttribute('href', '/question-bank/' + newUsername);
+            if (historyLink) historyLink.setAttribute('href', '/history/' + newUsername);
+        };
+
+        const postForm = async (form, submitBtn) => {
+            resetAlert();
+            if (!form) return;
+
+            if (submitBtn) submitBtn.disabled = true;
+            try {
+                const res = await fetch(form.getAttribute('action'), {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    body: new FormData(form)
+                });
+                const payload = await res.json().catch(() => ({}));
+                if (!res.ok || !payload.ok) {
+                    showAlert('error', payload.error || 'Ошибка');
+                    return;
+                }
+
+                showAlert('success', payload.message || 'Готово');
+
+                if (payload.username) {
+                    updateUsernameEverywhere(payload.username);
+                }
+
+                setTimeout(close, 700);
+            } catch (e) {
+                showAlert('error', 'Ошибка сети');
+            } finally {
+                if (submitBtn) submitBtn.disabled = false;
+            }
+        };
+
+        if (openUsernameBtn) {
+            openUsernameBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                open('username');
+            });
+        }
+        if (openPasswordBtn) {
+            openPasswordBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                open('password');
+            });
+        }
+
+        if (closeBtn) closeBtn.addEventListener('click', close);
+
+        overlay.addEventListener('click', function (e) {
+            if (e.target === overlay) close();
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && overlay.classList.contains('open')) close();
+        });
+
+        if (formUsername) {
+            formUsername.addEventListener('submit', function (e) {
+                e.preventDefault();
+                postForm(formUsername, submitUsernameBtn);
+            });
+        }
+        if (formPassword) {
+            formPassword.addEventListener('submit', function (e) {
+                e.preventDefault();
+                postForm(formPassword, submitPasswordBtn);
+            });
+        }
+    })();
+
+    (function () {
+        const toggleBtn = document.getElementById('filterToggle');
+        const popover = document.getElementById('filterPopover');
+        if (!toggleBtn || !popover) return;
+
+        const open = () => {
+            popover.classList.add('open');
+            popover.setAttribute('aria-hidden', 'false');
+            toggleBtn.setAttribute('aria-expanded', 'true');
+        };
+
+        const close = () => {
+            popover.classList.remove('open');
+            popover.setAttribute('aria-hidden', 'true');
+            toggleBtn.setAttribute('aria-expanded', 'false');
+        };
+
+        toggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (popover.classList.contains('open')) close();
+            else open();
+        });
+
+        popover.addEventListener('click', (e) => e.stopPropagation());
+
+        document.addEventListener('click', close);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') close();
+        });
+    })();
+
+    let pendingQuizIdForNameModal = null;
+    let pendingQuizPrivacy = null;
+    let pendingQuizPrivateKey = '';
+    let pendingQuizMode = 'individual';
+    let pendingQuizTeamCount = 0;
+
+    function openPrivateKeyModal(quizId) {
+        pendingQuizIdForNameModal = quizId;
+        const overlay = document.getElementById('privateKeyModalOverlay');
+        const input = document.getElementById('privateKeyInput');
+        const error = document.getElementById('privateKeyError');
+        if (!overlay || !input || !error) return;
+        pendingQuizPrivateKey = '';
+        input.value = '';
+        input.classList.remove('input-error');
+        error.style.display = 'none';
+        overlay.classList.add('open');
+        overlay.setAttribute('aria-hidden', 'false');
+        setTimeout(() => input.focus(), 0);
+    }
+
+    function closePrivateKeyModal() {
+        const overlay = document.getElementById('privateKeyModalOverlay');
+        const input = document.getElementById('privateKeyInput');
+        const error = document.getElementById('privateKeyError');
+        if (overlay) { overlay.classList.remove('open'); overlay.setAttribute('aria-hidden', 'true'); }
+        if (input) input.classList.remove('input-error');
+        if (error) error.style.display = 'none';
+        pendingQuizPrivateKey = '';
+        pendingQuizIdForNameModal = null;
+        pendingQuizPrivacy = null;
+    }
+
+    async function submitPrivateKeyModal() {
+        const input = document.getElementById('privateKeyInput');
+        const error = document.getElementById('privateKeyError');
+        if (!input || !error || !pendingQuizIdForNameModal) return;
+
+        const key = input.value.trim();
+        if (!key) {
+            input.classList.add('input-error');
+            error.textContent = 'Пожалуйста, введите приватный ключ.';
+            error.style.display = 'block';
+            input.focus();
+            return;
+        }
+
+        try {
+            const params = new URLSearchParams();
+            params.set('quiz_id', String(pendingQuizIdForNameModal));
+            params.set('key', key);
+
+            const res = await fetch('/api/quiz-private-key/validate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                body: params.toString()
+            });
+
+            const payload = await res.json().catch(() => ({}));
+            if (!res.ok || !payload.ok || !payload.valid) {
+                input.classList.add('input-error');
+                error.textContent = (payload && payload.error) ? payload.error : 'Неверный ключ';
+                error.style.display = 'block';
+                input.focus();
+                input.select();
+                return;
+            }
+
+            pendingQuizPrivateKey = key;
+            const overlay = document.getElementById('privateKeyModalOverlay');
+            if (overlay) { overlay.classList.remove('open'); overlay.setAttribute('aria-hidden', 'true'); }
+            openNameModal(pendingQuizIdForNameModal);
+        } catch (e) {
+            input.classList.add('input-error');
+            error.textContent = 'Ошибка проверки ключа. Попробуйте снова.';
+            error.style.display = 'block';
+            input.focus();
+        }
+    }
+
+    function openNameModal(quizId) {
+        pendingQuizIdForNameModal = quizId;
+
+        const overlay = document.getElementById('nameModalOverlay');
+        const input = document.getElementById('playerNameInput');
+        const error = document.getElementById('playerNameError');
+        const subtitle = document.getElementById('nameModalSubtitle');
+        const teamWrap = document.getElementById('teamNameFieldWrap');
+        const teamInput = document.getElementById('teamNameInput');
+        const teamError = document.getElementById('teamNameError');
+        const rouletteInfo = document.getElementById('teamRouletteInfo');
+
+        if (!overlay || !input || !error) return;
+
+        input.value = '';
+        input.classList.remove('input-error');
+        error.style.display = 'none';
+        if (teamInput) {
+            teamInput.value = '';
+            teamInput.classList.remove('input-error');
+        }
+        if (teamError) teamError.style.display = 'none';
+        if (subtitle) {
+            if (pendingQuizMode === 'team_manual') {
+                subtitle.textContent = 'Укажите имя и название команды, чтобы начать квиз';
+            } else if (pendingQuizMode === 'team_roulette') {
+                subtitle.textContent = 'Укажите имя. Команда будет назначена автоматически';
+            } else {
+                subtitle.textContent = 'Укажите имя, чтобы начать квиз';
+            }
+        }
+        if (teamWrap) teamWrap.style.display = (pendingQuizMode === 'team_manual') ? 'block' : 'none';
+        if (rouletteInfo) {
+            rouletteInfo.style.display = (pendingQuizMode === 'team_roulette') ? 'block' : 'none';
+            if (pendingQuizMode === 'team_roulette') {
+                rouletteInfo.textContent = pendingQuizTeamCount > 0
+                    ? `После ввода имени участник будет автоматически распределён в одну из команд: 1–${pendingQuizTeamCount}.`
+                    : 'После ввода имени участник будет автоматически распределён в одну из команд.';
+            }
+        }
+
+        overlay.classList.add('open');
+        overlay.setAttribute('aria-hidden', 'false');
+
+        setTimeout(() => input.focus(), 0);
+    }
+
+    function closeNameModal() {
+        const overlay = document.getElementById('nameModalOverlay');
+        const input = document.getElementById('playerNameInput');
+        const error = document.getElementById('playerNameError');
+        const teamInput = document.getElementById('teamNameInput');
+        const teamError = document.getElementById('teamNameError');
+
+        if (overlay) {
+            overlay.classList.remove('open');
+            overlay.setAttribute('aria-hidden', 'true');
+        }
+        if (input) input.classList.remove('input-error');
+        if (error) error.style.display = 'none';
+        if (teamInput) teamInput.classList.remove('input-error');
+        if (teamError) teamError.style.display = 'none';
+
+        pendingQuizIdForNameModal = null;
+    }
+
+    function submitNameModal() {
+        const input = document.getElementById('playerNameInput');
+        const error = document.getElementById('playerNameError');
+        const teamInput = document.getElementById('teamNameInput');
+        const teamError = document.getElementById('teamNameError');
+        if (!input || !error || !pendingQuizIdForNameModal) return;
+
+        let name = input.value.trim();
+
+        if (!name) {
+            input.classList.add('input-error');
+            error.style.display = 'block';
+            input.focus();
+            return;
+        }
+
+        if (name.length > 64) {
+            name = name.slice(0, 64);
+        }
+
+        const query = new URLSearchParams({ participant_name: name });
+        if (pendingQuizMode === 'team_manual') {
+            let teamName = teamInput ? teamInput.value.trim() : '';
+            if (!teamName) {
+                if (teamInput) teamInput.classList.add('input-error');
+                if (teamError) teamError.style.display = 'block';
+                if (teamInput) teamInput.focus();
+                return;
+            }
+            if (teamName.length > 64) teamName = teamName.slice(0, 64);
+            query.set('team_name', teamName);
+        }
+        if (pendingQuizPrivateKey) query.set('key', pendingQuizPrivateKey);
+        const url = `/quiz/${pendingQuizIdForNameModal}?${query.toString()}`;
+        window.location.href = url;
+    }
+
+    function startQuizFlow(event, quizId, privacy, participationMode, teamCount) {
+        event.preventDefault();
+        pendingQuizPrivacy = privacy || "public";
+        pendingQuizMode = participationMode || 'individual';
+        pendingQuizTeamCount = Number(teamCount || 0);
+        if (pendingQuizPrivacy === "private") {
+            openPrivateKeyModal(quizId);
+            return;
+        }
+        pendingQuizPrivateKey = "";
+        openNameModal(quizId);
+    }
+
+    (function initNameModalHandlers() {
+        const overlay = document.getElementById('nameModalOverlay');
+        const input = document.getElementById('playerNameInput');
+        const error = document.getElementById('playerNameError');
+        const teamInput = document.getElementById('teamNameInput');
+        const teamError = document.getElementById('teamNameError');
+        const keyOverlay = document.getElementById('privateKeyModalOverlay');
+        const keyInput = document.getElementById('privateKeyInput');
+        const keyError = document.getElementById('privateKeyError');
+        if (!overlay) return;
+
+        if (keyOverlay) {
+            keyOverlay.addEventListener('click', function (e) {
+                if (e.target === keyOverlay) closePrivateKeyModal();
+            });
+        }
+        if (keyInput && keyError) {
+            keyInput.addEventListener('input', function () {
+                if (keyInput.value.trim()) {
+                    keyInput.classList.remove('input-error');
+                    keyError.style.display = 'none';
+                }
+                if (!keyInput.value.trim()) {
+                    keyError.textContent = 'Пожалуйста, введите приватный ключ.';
+                }
+            });
+        }
+
+        overlay.addEventListener('click', function (e) {
+            if (e.target === overlay) closeNameModal();
+        });
+
+        if (input && error) {
+            input.addEventListener('input', function () {
+                if (input.value.trim()) {
+                    input.classList.remove('input-error');
+                    error.style.display = 'none';
+                }
+            });
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (keyOverlay && keyOverlay.classList.contains('open')) {
+                if (e.key === 'Escape') closePrivateKeyModal();
+                else if (e.key === 'Enter') submitPrivateKeyModal();
+                return;
+            }
+            if (!overlay.classList.contains('open')) return;
+            if (e.key === 'Escape') {
+                closeNameModal();
+            } else if (e.key === 'Enter') {
+                submitNameModal();
+            }
+        });
+    })();
+</script>
+</html>

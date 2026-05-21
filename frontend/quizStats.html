@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Статистика квиза</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .auth-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .25s ease;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .login-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: #fff;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .logout-btn {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .logout-btn:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        .title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #fff;
+            text-align: center;
+            margin: 8px 0 24px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 18px;
+            padding: 18px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .metric {
+            font-size: 12px;
+            color: #667;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-bottom: 6px;
+        }
+
+        .value {
+            font-size: 22px;
+            font-weight: 800;
+            color: #222;
+        }
+
+        .section {
+            margin-top: 18px;
+        }
+
+        .section h3 {
+            color: #fff;
+            font-size: 22px;
+            font-weight: 800;
+            margin: 18px 0 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+            color: #333;
+            vertical-align: top;
+        }
+
+        th {
+            background: rgba(102, 126, 234, 0.10);
+            text-align: left;
+            font-weight: 800;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(102, 126, 234, 0.12);
+            color: #2d3748;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .ok {
+            background: rgba(56, 161, 105, 0.14);
+        }
+
+        .bad {
+            background: rgba(229, 62, 62, 0.14);
+        }
+
+        .muted {
+            color: #666;
+        }
+
+        .qcard {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 18px;
+            padding: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 12px;
+        }
+
+        .qhead {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .qtitle {
+            font-weight: 900;
+            color: #222;
+        }
+
+        .qmeta {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .bar {
+            height: 10px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .bar > div {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 120px;
+            gap: 12px;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 28px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            padding: 12px;
+        }
+
+
+        .option-line {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        @media (max-width: 680px) {
+            .option-line {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        @media (max-width: 680px) {
+            .row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <a href="/" class="logo">
+            <div class="logo-icon">Q</div>
+            <div class="logo-text">QuizHub</div>
+        </a>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <a class="auth-btn login-btn" href="/quiz-stats/{{.Quiz.Id}}/export-excel">Экспорт в Excel</a>
+            <a class="auth-btn logout-btn" href="/my-quizzes/{{.Username}}">Назад</a>
+            <a class="auth-btn logout-btn" href="/logout">Выйти</a>
+        </div>
+    </header>
+
+    <div class="title">Статистика: {{.Quiz.Title}}</div>
+
+    <div class="grid">
+        <div class="card">
+            <div class="metric">Последняя попытка</div>
+            <div class="value">
+                {{if .Summary.LastFinishedAt}}{{.Summary.LastFinishedAt}}{{else}}—{{end}}
+            </div>
+        </div>
+        <div class="card">
+            <div class="metric">Участников (уник.)</div>
+            <div class="value">{{.Summary.ParticipantsTotal}}</div>
+        </div>
+        <div class="card">
+            <div class="metric">Всего попыток</div>
+            <div class="value">{{.Summary.AttemptsTotal}}</div>
+        </div>
+        <div class="card">
+            <div class="metric">Средний результат</div>
+            <div class="value">{{printf "%.1f" .Summary.AvgScore}} / {{printf "%.1f" .Summary.AvgMaxScore}}</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>Участники и попытки</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Время</th>
+                <th>Имя участника</th>
+                <th>Время</th>
+                <th>Результат</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {{range .Participants}}
+            <tr>
+                <td class="muted">{{.FinishedAt}}</td>
+                <td><span class="pill">{{if .ParticipantName}}{{.ParticipantName}}{{else}}Участник{{end}}</span></td>
+                <td class="muted">{{.DurationHuman}}</td>
+                <td><span class="pill ">{{.Score}} / {{.MaxScore}}</span>{{if gt $.Quiz.PassScore 0}} {{if ge .Score
+                    $.Quiz.PassScore}}<span class="pill ok">пройден</span>{{else}}<span
+                            class="pill bad">не пройден</span>{{end}}{{end}}
+                </td>
+                <td>
+                    <a class="auth-btn login-btn" href="/quiz-stats/{{$.Quiz.Id}}/participant/{{.SessionID}}">Детали</a>
+                </td>
+            </tr>
+            {{else}}
+            <tr>
+                <td colspan="5" class="muted">Пока нет попыток прохождения.</td>
+            </tr>
+            {{end}}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h3>Вопросы</h3>
+
+        {{range .Questions}}
+        <div class="qcard">
+            <div class="qhead">
+                <div class="qtitle">{{.Index}}. {{.Text}}</div>
+                <div class="qmeta">
+                    <span class="pill">Тип: {{.Type}}</span>
+                    <span class="pill">Баллы: {{.Points}}</span>
+                    {{if .HasAutoCheck}}
+                    <span class="pill ok">Верно: {{printf "%.1f" .CorrectPct}}%</span>
+                    {{else}}
+                    <span class="pill">Автопроверки нет</span>
+                    {{end}}
+                    <span class="pill">Ответов: {{.Total}}</span>
+                </div>
+            </div>
+
+            {{if eq .Type "open"}}
+            {{if .AcceptedAnswers}}
+            <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+                {{range .AcceptedAnswers}}
+                <span class="pill ok">{{.}}</span>
+                {{end}}
+            </div>
+            {{end}}
+            {{if gt .SkippedCount 0}}
+            <div class="row" style="margin-top:10px;">
+                <div>
+                    <div style="display:flex; justify-content:space-between; gap:10px;">
+                        <div><span class="pill">Пустой ответ</span></div>
+                        <div class="muted">{{.SkippedCount}} ({{printf "%.1f" .SkippedPct}}%)</div>
+                    </div>
+                    <div class="bar" style="margin-top:6px;">
+                        <div style='width: {{printf "%.1f" .SkippedPct}}%;'></div>
+                    </div>
+                </div>
+            </div>
+            {{else}}
+            <div class="muted" style="margin-top:10px;">Текстовые ответы учитываются в проценте правильных, но не раскладываются по вариантам.</div>
+            {{end}}
+            {{else if or (gt (len .Options) 0) (gt .SkippedCount 0)}}
+            <div style="margin-top:10px;">
+                {{range .Options}}
+                <div class="row">
+                    <div>
+                        <div style="display:flex; justify-content:space-between; gap:10px; align-items:flex-start;">
+                            <div style="display:flex; gap:8px; align-items:flex-start;">
+                                <span class="pill {{if .IsCorrect}}ok{{end}}">{{if .IsCorrect}}✔{{else}}•{{end}}</span>
+                                <span style="font-weight:800; color:#222; word-break:break-word;">{{.OptionText}}</span>
+                            </div>
+                            <div class="muted" style="white-space:nowrap;">{{.Count}} ({{printf "%.1f" .Percent}}%)</div>
+                        </div>
+                        <div class="bar" style="margin-top:6px;">
+                            <div style='width: {{printf "%.1f" .Percent}}%;'></div>
+                        </div>
+                    </div>
+                    <div></div>
+                </div>
+                {{end}}
+            </div>
+            {{if gt .SkippedCount 0}}
+            <div class="row">
+                <div>
+                    <div style="display:flex; justify-content:space-between; gap:10px;">
+                        <div><span class="pill">Пропуск</span></div>
+                        <div class="muted">{{.SkippedCount}} ({{printf "%.1f" .SkippedPct}}%)</div>
+                    </div>
+
+                    <div class="bar" style="margin-top:6px;">
+                        <div style='width: {{printf "%.1f" .SkippedPct}}%;'>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{end}}
+            {{else}}
+            <div class="muted">Для этого вопроса нет вариантов ответа (или пока нет ответов пользователей).</div>
+            {{end}}
+        </div>
+        {{end}}
+    </div>
+
+    <footer class="footer">
+        <p>© 2026 QuizHub</p>
+    </footer>
+</div>
+</body>
+</html>

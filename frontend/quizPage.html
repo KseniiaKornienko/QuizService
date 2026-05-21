@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Quiz.Title}} - Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f7fa;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .quiz-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .quiz-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .quiz-header .description {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .quiz-meta {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .privacy-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .privacy-badge.public {
+            background: #48bb78;
+        }
+
+        .privacy-badge.private {
+            background: #ed8936;
+        }
+
+        .questions-container {
+            padding: 40px;
+        }
+
+        .questions-count {
+            font-size: 1.3rem;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-weight: 600;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eef2f7;
+        }
+
+        .question-item {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .question-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2d3748;
+            flex: 1;
+        }
+
+        .question-points {
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-left: 15px;
+            white-space: nowrap;
+        }
+
+        .question-type {
+            display: inline-block;
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .options-container {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-item {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .option-item:hover {
+            border-color: #cbd5e0;
+        }
+
+        .option-item.correct {
+            border-color: #48bb78;
+            background-color: #f0fff4;
+        }
+
+        .option-item.correct::before {
+            content: "✓";
+            color: #48bb78;
+            font-weight: bold;
+            margin-right: 12px;
+            font-size: 1.1rem;
+        }
+
+        .option-text {
+            flex: 1;
+            font-size: 1.1rem;
+        }
+
+        .open-answer {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+            font-style: italic;
+            color: #4a5568;
+        }
+
+        .open-answer label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2d3748;
+        }
+
+        .open-answer input,
+        .open-answer textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            outline: none;
+        }
+
+        .open-answer input:focus,
+        .open-answer textarea:focus {
+            border-color: #667eea;
+        }
+
+
+        .media-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .media-container img,
+        .media-container video {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .media-placeholder {
+            background: #e2e8f0;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            color: #718096;
+            font-size: 1.1rem;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 40px;
+            padding: 30px;
+            border-top: 1px solid #eef2f7;
+        }
+
+        .btn {
+            padding: 14px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-back {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-back:hover {
+            background: #cbd5e0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #718096;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #4a5568;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto 30px;
+        }
+        .option-item {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 0;
+            margin-bottom: 0;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+        }
+
+        .option-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+            border-color: #cbd5e0;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            cursor: pointer;
+            padding: 15px;
+        }
+
+        .option-label input {
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+            flex: 0 0 auto;
+        }
+
+
+        .option-label.with-image {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+        }
+
+        .option-image-large {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            max-height: none;
+            object-fit: cover;
+            border-radius: 14px;
+            border: 1px solid rgba(0,0,0,0.12);
+            display: block;
+        }
+
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .option-result.with-image {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .option-result-toprow {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option-result-image {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            max-height: none;
+            object-fit: cover;
+            border-radius: 14px;
+            border: 1px solid rgba(0,0,0,0.12);
+            display: block;
+        }
+
+        .option-item.selected {
+            border-color: #667eea;
+            background-color: #eef2ff;
+        }
+
+        @supports selector(.options-container:has(.option-label.with-image)) {
+            .options-container:has(.option-label.with-image) {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 12px;
+            }
+
+            .options-container:has(.option-label.with-image) .option-item {
+                margin-bottom: 0;
+            }
+
+            .options-container:has(.option-result.with-image) {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 12px;
+            }
+        }
+
+        @media (max-width: 700px) {
+            @supports selector(.options-container:has(.option-label.with-image)) {
+                .options-container:has(.option-label.with-image),
+                .options-container:has(.option-result.with-image) {
+                    grid-template-columns: 1fr;
+                }
+            }
+        }
+
+
+        .result-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 28px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        .result-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .result-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #2d3748;
+        }
+
+        .result-badge {
+            background: #667eea;
+            color: #ffffff;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .result-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .metric {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: #4a5568;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        .metric-value {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #2d3748;
+        }
+
+        .progress {
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.8s ease;
+        }
+
+        .result-hint {
+            margin-top: 12px;
+            color: #4a5568;
+            font-size: 1.02rem;
+        }
+
+        .review-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #a0aec0;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 16px;
+        }
+
+        .review-item.correct { border-left-color: #48bb78; }
+        .review-item.wrong { border-left-color: #f56565; }
+        .review-item.unchecked { border-left-color: #ed8936; }
+
+        .review-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .review-title {
+            font-size: 1.18rem;
+            font-weight: 800;
+            color: #2d3748;
+            margin-bottom: 6px;
+        }
+
+        .review-sub {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .review-tag {
+            display: inline-block;
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .review-points {
+            color: #4a5568;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .status-pill {
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            border: 1px solid transparent;
+        }
+
+        .status-pill.correct { background: #f0fff4; color: #2f855a; border-color: #9ae6b4; }
+        .status-pill.wrong { background: #fff5f5; color: #c53030; border-color: #feb2b2; }
+        .status-pill.unchecked { background: #fffaf0; color: #b7791f; border-color: #fbd38d; }
+
+        .option-result {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option-result.correct {
+            border-color: #48bb78;
+            background: #f0fff4;
+        }
+
+        .option-result.wrong {
+            border-color: #f56565;
+            background: #fff5f5;
+        }
+
+        .option-result.selected:not(.wrong):not(.correct) {
+            border-color: #667eea;
+            background: #eef2ff;
+        }
+
+        .option-marker {
+            width: 26px;
+            height: 26px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            color: #4a5568;
+            background: #edf2f7;
+            flex: 0 0 auto;
+        }
+
+        .option-result.correct .option-marker { color: #2f855a; background: #c6f6d5; }
+        .option-result.wrong .option-marker { color: #c53030; background: #fed7d7; }
+        .option-result.selected:not(.wrong):not(.correct) .option-marker { color: #4c51bf; background: #c3dafe; }
+
+        .pill {
+            margin-left: auto;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+
+        .pill.your { background: #eef2ff; color: #4c51bf; border-color: #c3dafe; }
+        .pill.right { background: #f0fff4; color: #2f855a; border-color: #9ae6b4; }
+
+        .open-result {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        .open-label {
+            font-weight: 800;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .open-text {
+            color: #4a5568;
+            font-style: italic;
+            white-space: pre-wrap;
+        }
+
+
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            .quiz-header {
+                padding: 30px 20px;
+            }
+
+            .quiz-header h1 {
+                font-size: 2rem;
+            }
+
+            .questions-container {
+                padding: 20px;
+            }
+
+            .question-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .question-points {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+
+            .quiz-meta {
+                gap: 15px;
+            }
+
+            .actions {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .privacy-badge {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin: 10px auto;
+                display: inline-block;
+            }
+
+            .option-item:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+                border-color: #cbd5e0;
+            }
+
+        }
+
+        .name-modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .name-modal-overlay.open { display: flex; }
+        .name-modal { width: 100%; max-width: 520px; background: #fff; border-radius: 16px; box-shadow: 0 24px 60px rgba(0,0,0,.25); overflow: hidden; }
+        .name-modal-header { display:flex; align-items:center; justify-content:space-between; padding:16px 18px; border-bottom:1px solid #e2e8f0; }
+        .name-modal-header h3 { margin:0; font-size:1.1rem; color:#1f2937; }
+        .name-modal-close { border:none; background:transparent; font-size:28px; line-height:1; cursor:pointer; color:#64748b; }
+        .name-modal-body { padding:18px; }
+        .name-modal-subtitle { color:#475569; margin-bottom:12px; }
+        .name-modal-input { width:100%; padding:12px 14px; border:2px solid #e2e8f0; border-radius:10px; font-size:1rem; outline:none; }
+        .name-modal-input:focus { border-color:#667eea; }
+        .name-modal-input.input-error { border-color:#ef4444; }
+        .name-modal-error { margin-top:8px; color:#dc2626; font-weight:600; display:none; }
+        .name-modal-actions { display:flex; justify-content:flex-end; gap:10px; padding:14px 18px 18px; }
+        .name-modal-btn { border:none; border-radius:10px; padding:10px 14px; cursor:pointer; font-weight:700; }
+        .name-modal-btn.secondary { background:#e2e8f0; color:#334155; }
+        .name-modal-btn.primary { background:#667eea; color:#fff; }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="quiz-header">
+        <div class="privacy-badge {{.Quiz.Privacy}}">
+            {{if eq .Quiz.Privacy "public"}}Публичный{{else}}Приватный{{end}}
+        </div>
+        <h1>{{.Quiz.Title}}</h1>
+        {{if .Quiz.Description}}
+        <p class="description">{{.Quiz.Description}}</p>
+        {{end}}
+        <div class="quiz-meta">
+            <span class="meta-item">Категория: {{.Quiz.Category}}</span>
+            <span class="meta-item">Автор: {{.Quiz.Author}}</span>
+            <span class="meta-item">Вопросов: {{len .Questions}}</span>
+        </div>
+    </div>
+
+    <div class="questions-container">
+        {{if .RequiresKey}}
+        <div class="result-card">
+            <div class="result-top">
+                <div class="result-title">Приватный квиз</div>
+                <div class="result-badge">Нужен ключ</div>
+            </div>
+            <p class="result-hint" style="margin-top: 0;">Чтобы начать прохождение, сначала введите приватный ключ, затем данные участника{{if eq .Quiz.ParticipationMode "team_manual"}} и команду{{end}}.</p>
+
+            {{if .KeyError}}
+            <div style="margin-top: 14px; padding: 12px 14px; border-radius: 10px; border: 1px solid #feb2b2; background: #fff5f5; color: #c53030; font-weight: 700;">
+                {{.KeyError}}
+            </div>
+            {{end}}
+
+            <div class="actions" style="padding: 0; border-top: none; margin-top: 16px;">
+                <button type="button" class="btn btn-start" onclick="openPrivateKeyAccessModal()">Ввести ключ и начать</button>
+                <a href="/" class="btn btn-back">На главную</a>
+            </div>
+            <input type="hidden" id="initialParticipantName" value="{{.ParticipantName}}">
+            <input type="hidden" id="initialTeamName" value="{{.TeamName}}">
+            <input type="hidden" id="initialTeamNumber" value="{{.TeamNumber}}">
+            <input type="hidden" id="initialProvidedKey" value="{{.ProvidedKey}}">
+        </div>
+
+        {{else}}
+
+        {{if .Result}}
+        <div class="result-card" id="resultCard" data-score="{{.Result.Score}}" data-max="{{.Result.MaxScore}}" data-pass-score="{{.Result.PassScore}}" data-has-pass="{{if .Result.HasPassScore}}1{{else}}0{{end}}" data-passed="{{if .Result.Passed}}1{{else}}0{{end}}">
+            <div class="result-top">
+                <div class="result-title">Ваш результат</div>
+                <div class="result-badge">Попытка #{{.Result.AttemptNumber}}</div>
+            </div>
+
+            <div class="result-metrics">
+                <div class="metric">
+                    <div class="metric-label">Баллы (автопроверка)</div>
+                    <div class="metric-value">{{.Result.Score}} / {{.Result.MaxScore}}</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Процент</div>
+                    <div class="metric-value" id="resultPercent">—</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Время прохождения</div>
+                    <div class="metric-value" id="resultDuration">{{.Result.DurationHuman}}</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Статус</div>
+                    <div class="metric-value" id="resultPassStatus">{{if .Result.HasPassScore}}{{if .Result.Passed}}Пройден{{else}}Не пройден{{end}}{{else}}—{{end}}</div>
+                </div>
+            </div>
+            {{if .ParticipantName}}
+            <div style="margin-top:8px; color:#475569; font-weight:600;">Участник: {{.ParticipantName}}{{if .Result.TeamName}} · Команда: {{.Result.TeamName}}{{end}}</div>
+            {{end}}
+            {{if .Result.HasPassScore}}
+            <div style="margin-top:8px; color:#475569; font-weight:600;">Порог прохождения: {{.Result.PassScore}} баллов</div>
+            {{end}}
+            {{if .Result.TeamName}}
+            <div style="margin-top:8px; color:#334155; font-weight:700;">Командный зачёт: {{.Result.TeamName}}{{if gt .Result.TeamRank 0}} · место #{{.Result.TeamRank}} из {{.Result.TeamsTotal}}{{end}}</div>
+            {{end}}
+
+            <div class="progress" aria-hidden="true">
+                <div class="progress-bar" id="resultProgress"></div>
+            </div>
+
+            <div class="result-hint" id="resultHint">Ответы сохранены. Можете пройти квиз ещё раз, чтобы улучшить результат.</div>
+        </div>
+
+        {{if .TeamLeaderboard}}
+        <div class="result-card" style="margin-top:16px;">
+            <div class="result-top">
+                <div class="result-title">{{if and .Result (gt .Result.TeamsTotal 10)}}Топ-10 команд{{else}}Рейтинг команд{{end}}</div>
+                <div class="result-badge">
+                    {{if .Result}}
+                    {{if gt .Result.TeamsTotal 10}}10 из {{.Result.TeamsTotal}}{{else}}{{.Result.TeamsTotal}} команд{{end}}
+                    {{else}}
+                    {{len .TeamLeaderboard}} команд
+                    {{end}}
+                </div>
+            </div>
+            <div style="display:grid; gap:10px; margin-top:12px;">
+                {{range .TeamLeaderboard}}
+                <div style="display:flex; justify-content:space-between; gap:12px; align-items:center; padding:12px 14px; border-radius:14px; border:1px solid {{if .IsCurrent}}#c7d2fe{{else}}#e2e8f0{{end}}; background: {{if .IsCurrent}}rgba(99,102,241,.10){{else}}rgba(255,255,255,.8){{end}};">
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                        <div style="font-weight:800; color:#1f2937;">#{{.Rank}} {{.TeamName}}</div>
+                        <div style="color:#64748b; font-weight:600;">Участников: {{.Members}}</div>
+                    </div>
+                    <div style="font-weight:900; font-size:20px; color:#1f2937;">{{.Score}}</div>
+                </div>
+                {{end}}
+            </div>
+        </div>
+        {{end}}
+
+        <h2 class="questions-count">Разбор ответов ({{len .Review}})</h2>
+
+        {{range .Review}}
+        <div class="review-item {{.Status}}">
+            {{if .QuestionMediaURL}}
+            <div class="media-container">
+                {{if eq .QuestionMediaType "video"}}
+                <video controls src="{{.QuestionMediaURL}}"></video>
+                {{else}}
+                <img src="{{.QuestionMediaURL}}" alt="question media">
+                {{end}}
+            </div>
+            {{end}}
+
+            <div class="review-top">
+                <div class="review-left">
+                    <div class="review-title">{{.Index}}. {{.Text}}</div>
+                    <div class="review-sub">
+                        <span class="review-tag">{{.TypeLabel}}</span>
+                        {{if eq .Status "unchecked"}}
+                        <span class="review-points">— / {{.Points}} баллов</span>
+                        {{else}}
+                        <span class="review-points">{{.Earned}} / {{.Points}} баллов</span>
+                        {{end}}
+                    </div>
+                </div>
+                <div class="status-pill {{.Status}}">{{.StatusLabel}}</div>
+            </div>
+
+            {{if eq .Type "open"}}
+            <div class="open-result">
+                <div class="open-label">Ваш ответ:</div>
+                <div class="open-text">{{if .UserAnswerText}}{{.UserAnswerText}}{{else}}—{{end}}</div>
+                {{if .AcceptedAnswers}}
+                <div class="open-label" style="margin-top:12px;">Допустимые ответы:</div>
+                <div class="open-text">{{range $idx, $ans := .AcceptedAnswers}}{{if $idx}}
+                    {{end}}{{$ans}}{{end}}</div>
+                {{end}}
+            </div>
+            {{else if .Options}}
+            <div class="options-container">
+                {{range .Options}}
+                <div class="option-result {{if .IsCorrect}}correct{{end}} {{if .IsSelected}}selected{{end}} {{if and .IsSelected (not .IsCorrect)}}wrong{{end}} {{if .ImageURL}}with-image{{end}}">
+                    <div class="option-result-toprow">
+                        <span class="option-marker">{{if .IsCorrect}}✓{{else if .IsSelected}}✕{{else}}•{{end}}</span>
+                        <span class="option-text {{if .ImageURL}}visually-hidden{{end}}">{{.Text}}</span>
+                        {{if .IsSelected}}<span class="pill your">ваш выбор</span>{{end}}
+                        {{if .IsCorrect}}<span class="pill right">правильный</span>{{end}}
+                    </div>
+                    {{if .ImageURL}}
+                    <img src="{{.ImageURL}}" alt="option" class="option-result-image">
+                    {{end}}
+                </div>
+                {{end}}
+            </div>
+            {{end}}
+        </div>
+        {{end}}
+
+        <div class="actions">
+            <a href="/quiz/{{.Quiz.Id}}" class="btn btn-start">Пройти ещё раз</a>
+            <a href="/" class="btn btn-back">На главную</a>
+        </div>
+
+        {{else}}
+
+        {{if .Questions}}
+        <h2 class="questions-count">Вопросы квиза ({{len .Questions}})</h2>
+
+        {{if gt .Quiz.TimeLimitSeconds 0}}
+        <div id="quizTimerBanner" data-time-limit="{{.Quiz.TimeLimitSeconds}}" style="margin:0 0 14px; background:rgba(255,255,255,.96); border:2px solid #cbd5e1; border-radius:14px; padding:12px 14px; display:flex; justify-content:space-between; gap:12px; align-items:center;">
+            <div style="font-weight:700; color:#334155;">Таймер прохождения</div>
+            <div id="quizTimerValue" style="font-weight:900; font-size:20px; color:#1d4ed8;">--:--</div>
+        </div>
+        {{end}}
+
+        <form method="POST" action="/quiz/{{.Quiz.Id}}" id="quizSubmitForm" data-time-limit="{{.Quiz.TimeLimitSeconds}}">
+            <input type="hidden" name="started_at" value="{{.StartedAt}}">
+            <input type="hidden" name="key" value="{{.ProvidedKey}}">
+            {{if or (not .ParticipantName) (and (eq .Quiz.ParticipationMode "team_manual") (not .TeamName))}}
+            <div class="question-item" style="border-style:dashed;">
+                <div class="question-header">
+                    <div class="question-text">
+                        <span>Данные участника</span>
+                        <div class="question-type">{{if eq .Quiz.ParticipationMode "team_manual"}}командный режим{{else if eq .Quiz.ParticipationMode "team_roulette"}}team roulette{{else}}индивидуальный режим{{end}}</div>
+                    </div>
+                </div>
+                {{if .EntryError}}
+                <div style="margin-bottom:12px; padding:12px 14px; border-radius:10px; border:1px solid #feb2b2; background:#fff5f5; color:#c53030; font-weight:700;">{{.EntryError}}</div>
+                {{end}}
+                <div class="open-answer">
+                    <label for="participant-name-inline">Имя участника:</label>
+                    <input id="participant-name-inline" class="name-modal-input" type="text" name="participant_name" maxlength="64" value="{{.ParticipantName}}" required>
+                </div>
+                {{if eq .Quiz.ParticipationMode "team_manual"}}
+                <div class="open-answer" style="margin-top:12px;">
+                    <label for="team-name-inline">Название команды:</label>
+                    <input id="team-name-inline" class="name-modal-input" type="text" name="team_name" maxlength="64" value="{{.TeamName}}" required>
+                </div>
+                {{else if eq .Quiz.ParticipationMode "team_roulette"}}
+                <div style="margin-top:12px; color:#475569; font-weight:600;">Команда будет назначена автоматически{{if .TeamName}}: {{.TeamName}}{{end}}.</div>
+                {{end}}
+            </div>
+            {{else}}
+            <input type="hidden" name="participant_name" value="{{.ParticipantName}}">
+            {{if .TeamName}}<input type="hidden" name="team_name" value="{{.TeamName}}">{{end}}
+            {{if gt .TeamNumber 0}}<input type="hidden" name="team_number" value="{{.TeamNumber}}">{{end}}
+            <div style="margin:0 0 14px; background:rgba(255,255,255,.96); border:2px solid #cbd5e1; border-radius:14px; padding:12px 14px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px; align-items:center;">
+                <div style="font-weight:700; color:#334155;">Участник: {{.ParticipantName}}</div>
+                {{if .TeamName}}<div style="font-weight:800; color:#4338ca;">Команда: {{.TeamName}}</div>{{end}}
+            </div>
+            {{end}}
+
+            {{range $index, $question := .Questions}}
+            <div class="question-item">
+                {{if $question.Question.QuestionMediaURL}}
+                <div class="media-container">
+                    {{if eq $question.Question.QuestionMediaType "video"}}
+                    <video controls src="{{$question.Question.QuestionMediaURL}}"></video>
+                    {{else}}
+                    <img src="{{$question.Question.QuestionMediaURL}}" alt="question media">
+                    {{end}}
+                </div>
+                {{end}}
+
+                <div class="question-header">
+                    <div class="question-text">
+                        <span>{{$index}}. {{$question.Question.Text}}</span>
+                        <div class="question-type">{{$question.Question.Type}}</div>
+                    </div>
+                    <div class="question-points">{{$question.Question.Points}} баллов</div>
+                </div>
+
+                {{if or (eq $question.Question.Type "single") (eq $question.Question.Type "photo_single")}}
+                <div class="options-container">
+                    {{range $index, $option := $question.Options}}
+                    <div class="option-item">
+                        <label class="option-label {{if $option.ImageURL}}with-image{{end}}" for="sin-q-{{$question.Question.Id}}_opt-{{$option.Id}}">
+                            <input type="radio"
+                                   id="sin-q-{{$question.Question.Id}}_opt-{{$option.Id}}"
+                                   name="q_{{$question.Question.Id}}"
+                                   value="{{$option.Id}}">
+                            {{if $option.ImageURL}}
+                            <img src="{{$option.ImageURL}}" alt="option" class="option-image-large">
+                            <span class="option-text visually-hidden">{{$option.OptionText}}</span>
+                            {{else}}
+                            <span class="option-text">{{$option.OptionText}}</span>
+                            {{end}}
+                        </label>
+                    </div>
+                    {{end}}
+                </div>
+
+                {{else if or (eq $question.Question.Type "multiple") (eq $question.Question.Type "photo_multiple")}}
+                <div class="options-container">
+                    {{range $index, $option := $question.Options}}
+                    <div class="option-item">
+                        <label class="option-label {{if $option.ImageURL}}with-image{{end}}" for="mul-q-{{$question.Question.Id}}_opt-{{$option.Id}}">
+                            <input type="checkbox"
+                                   id="mul-q-{{$question.Question.Id}}_opt-{{$option.Id}}"
+                                   name="q_{{$question.Question.Id}}"
+                                   value="{{$option.Id}}">
+                            {{if $option.ImageURL}}
+                            <img src="{{$option.ImageURL}}" alt="option" class="option-image-large">
+                            <span class="option-text visually-hidden">{{$option.OptionText}}</span>
+                            {{else}}
+                            <span class="option-text">{{$option.OptionText}}</span>
+                            {{end}}
+                        </label>
+                    </div>
+                    {{end}}
+                </div>
+
+                {{else if eq $question.Question.Type "open"}}
+                <div class="open-answer">
+                    <label for="open-q-{{$question.Question.Id}}">Ваш ответ:</label>
+                    <textarea id="open-q-{{$question.Question.Id}}"
+                              name="q_{{$question.Question.Id}}_text"
+                              rows="3"
+                              placeholder="Введите ответ"></textarea>
+                </div>
+
+                {{else if eq $question.Question.Type "video"}}
+                {{if not $question.Question.QuestionMediaURL}}
+                <div class="media-container">
+                    <div class="media-placeholder">
+                        🎥 Видео
+                    </div>
+                </div>
+                {{end}}
+                {{else if eq $question.Question.Type "photo"}}
+                {{if not $question.Question.QuestionMediaURL}}
+                <div class="media-container">
+                    <div class="media-placeholder">
+                        🖼️ Фото
+                    </div>
+                </div>
+                {{end}}
+                {{end}}
+            </div>
+            {{end}}
+
+            <div class="actions" style="margin-top: 10px;">
+                <button type="submit" class="btn btn-start">Отправить ответы</button>
+                <a href="/" class="btn btn-back">Вернуться на главную</a>
+            </div>
+        </form>
+        {{else}}
+        <div class="empty-state">
+            <h3>В этом квизе пока нет вопросов</h3>
+            <p>Когда вопросы будут добавлены, они появятся здесь.</p>
+        </div>
+        {{end}}
+        {{end}}
+        {{end}}
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const questions = document.querySelectorAll('.question-item');
+            questions.forEach((question, index) => {
+                setTimeout(() => {
+                    question.style.opacity = '0';
+                    question.style.transform = 'translateY(20px)';
+                    question.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+
+                    setTimeout(() => {
+                        question.style.opacity = '1';
+                        question.style.transform = 'translateY(0)';
+                    }, 50);
+                }, index * 100);
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.options-container input[type="checkbox"], .options-container input[type="radio"]')
+                .forEach(function (input) {
+                    const apply = () => {
+                        const item = input.closest('.option-item');
+                        if (!item) return;
+
+                        if (input.type === 'radio') {
+                            document.querySelectorAll('input[name="' + input.name + '"]').forEach(function (r) {
+                                const ri = r.closest('.option-item');
+                                if (ri) ri.classList.toggle('selected', r.checked);
+                            });
+                        } else {
+                            item.classList.toggle('selected', input.checked);
+                        }
+                    };
+
+                    input.addEventListener('change', apply);
+                    apply();
+                });
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            const card = document.getElementById('resultCard');
+            if (!card) return;
+
+            const score = Number(card.getAttribute('data-score') || '0');
+            const max = Number(card.getAttribute('data-max') || '0');
+            const percent = (max > 0) ? Math.round((score / max) * 100) : 0;
+            const hasPass = card.getAttribute('data-has-pass') === '1';
+            const passScore = Number(card.getAttribute('data-pass-score') || '0');
+            const passed = card.getAttribute('data-passed') === '1';
+
+            const percentEl = document.getElementById('resultPercent');
+            const bar = document.getElementById('resultProgress');
+            const hint = document.getElementById('resultHint');
+            const passStatusEl = document.getElementById('resultPassStatus');
+
+            if (percentEl) percentEl.textContent = percent + '%';
+            if (bar) bar.style.width = Math.min(100, Math.max(0, percent)) + '%';
+
+            if (passStatusEl && hasPass) {
+                passStatusEl.textContent = passed ? 'Пройден' : 'Не пройден';
+            }
+
+            if (hint) {
+                if (max === 0) hint.textContent = 'Ответы сохранены.';
+                else if (hasPass && !passed) hint.textContent = 'Порог прохождения не достигнут.';
+                else if (hasPass && passed) hint.textContent = 'Квиз пройден.';
+                else if (percent >= 90) hint.textContent = 'Отлично.';
+                else if (percent >= 70) hint.textContent = 'Хорошо.';
+                else if (percent >= 40) hint.textContent = 'Нормально.';
+                else hint.textContent = 'Есть куда расти. Попробуйте ещё раз.';
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('quizSubmitForm');
+            const banner = document.getElementById('quizTimerBanner');
+            const timerValue = document.getElementById('quizTimerValue');
+            if (!form || !banner || !timerValue) return;
+
+            const limit = Number(form.getAttribute('data-time-limit') || '0');
+            if (!(limit > 0)) return;
+
+            const startedInput = form.querySelector('input[name="started_at"]');
+            let startTs = Date.now();
+            if (startedInput && startedInput.value) {
+                const safe = startedInput.value.replace(' ', 'T');
+                const parsed = new Date(safe);
+                if (!Number.isNaN(parsed.getTime())) startTs = parsed.getTime();
+            }
+
+            let submittedByTimer = false;
+            function fmt(sec) {
+                sec = Math.max(0, Math.floor(sec));
+                const h = Math.floor(sec / 3600);
+                const m = Math.floor((sec % 3600) / 60);
+                const s = sec % 60;
+                if (h > 0) return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+                return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+            }
+
+            function tick() {
+                const elapsed = Math.floor((Date.now() - startTs) / 1000);
+                const left = limit - elapsed;
+                timerValue.textContent = fmt(left);
+                if (left <= 10) timerValue.style.color = '#dc2626';
+                if (left <= 0 && !submittedByTimer) {
+                    submittedByTimer = true;
+                    const btn = form.querySelector('button[type="submit"]');
+                    if (btn) btn.disabled = true;
+                    form.submit();
+                }
+            }
+            tick();
+            setInterval(tick, 1000);
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const requiresKey = {{if .RequiresKey}}true{{else}}false{{end}};
+            if (!requiresKey) return;
+
+            let pendingKey = '';
+            const participationMode = '{{.Quiz.ParticipationMode}}';
+            const keyOverlay = document.getElementById('privateKeyModalOverlay');
+            const keyInput = document.getElementById('privateKeyInput');
+            const keyError = document.getElementById('privateKeyError');
+            const nameOverlay = document.getElementById('nameModalOverlay');
+            const nameInput = document.getElementById('playerNameInput');
+            const nameError = document.getElementById('playerNameError');
+            const teamInput = document.getElementById('teamNameInput');
+            const teamError = document.getElementById('teamNameError');
+            const teamWrap = document.getElementById('teamNameFieldWrap');
+            const teamRouletteInfo = document.getElementById('teamRouletteInfo');
+            const nameSubtitle = document.getElementById('nameModalSubtitle');
+            const initialName = document.getElementById('initialParticipantName');
+            const initialTeamName = document.getElementById('initialTeamName');
+            const initialKey = document.getElementById('initialProvidedKey');
+
+            window.openPrivateKeyAccessModal = function () {
+                if (!keyOverlay || !keyInput) return;
+                pendingKey = (initialKey && initialKey.value) ? initialKey.value : '';
+                keyInput.value = pendingKey;
+                if (keyError) keyError.style.display = 'none';
+                keyInput.classList.remove('input-error');
+                keyOverlay.classList.add('open');
+                keyOverlay.setAttribute('aria-hidden', 'false');
+                setTimeout(() => keyInput.focus(), 0);
+            };
+
+            window.closePrivateKeyAccessModal = function () {
+                if (keyOverlay) { keyOverlay.classList.remove('open'); keyOverlay.setAttribute('aria-hidden', 'true'); }
+            };
+
+            window.submitPrivateKeyAccessModal = function () {
+                const key = (keyInput && keyInput.value || '').trim();
+                if (!key) {
+                    if (keyInput) keyInput.classList.add('input-error');
+                    if (keyError) keyError.style.display = 'block';
+                    if (keyInput) keyInput.focus();
+                    return;
+                }
+                pendingKey = key;
+                window.closePrivateKeyAccessModal();
+                if (nameOverlay && nameInput) {
+                    if (initialName && initialName.value) nameInput.value = initialName.value;
+                    if (nameError) nameError.style.display = 'none';
+                    nameInput.classList.remove('input-error');
+                    if (teamInput) {
+                        teamInput.value = (initialTeamName && initialTeamName.value) ? initialTeamName.value : '';
+                        teamInput.classList.remove('input-error');
+                    }
+                    if (teamError) teamError.style.display = 'none';
+                    if (teamWrap) teamWrap.style.display = participationMode === 'team_manual' ? 'block' : 'none';
+                    if (teamRouletteInfo) teamRouletteInfo.style.display = participationMode === 'team_roulette' ? 'block' : 'none';
+                    if (nameSubtitle) {
+                        if (participationMode === 'team_manual') nameSubtitle.textContent = 'Укажите имя и название команды';
+                        else if (participationMode === 'team_roulette') nameSubtitle.textContent = 'Укажите имя. Команда будет назначена автоматически';
+                        else nameSubtitle.textContent = 'Укажите имя, под которым вы пройдёте квиз';
+                    }
+                    nameOverlay.classList.add('open');
+                    nameOverlay.setAttribute('aria-hidden', 'false');
+                    setTimeout(() => nameInput.focus(), 0);
+                }
+            };
+
+            window.closeNameAccessModal = function () {
+                if (nameOverlay) { nameOverlay.classList.remove('open'); nameOverlay.setAttribute('aria-hidden', 'true'); }
+            };
+
+            window.submitNameAccessModal = function () {
+                let name = (nameInput && nameInput.value || '').trim();
+                if (!name) {
+                    if (nameInput) nameInput.classList.add('input-error');
+                    if (nameError) nameError.style.display = 'block';
+                    if (nameInput) nameInput.focus();
+                    return;
+                }
+                if (name.length > 64) name = name.slice(0, 64);
+                const qs = new URLSearchParams();
+                qs.set('key', pendingKey);
+                qs.set('participant_name', name);
+                if (participationMode === 'team_manual') {
+                    let teamName = (teamInput && teamInput.value || '').trim();
+                    if (!teamName) {
+                        if (teamInput) teamInput.classList.add('input-error');
+                        if (teamError) teamError.style.display = 'block';
+                        if (teamInput) teamInput.focus();
+                        return;
+                    }
+                    if (teamName.length > 64) teamName = teamName.slice(0, 64);
+                    qs.set('team_name', teamName);
+                }
+                window.location.href = '/quiz/{{.Quiz.Id}}?' + qs.toString();
+            };
+
+            if (keyOverlay) keyOverlay.addEventListener('click', (e) => { if (e.target === keyOverlay) window.closePrivateKeyAccessModal(); });
+            if (nameOverlay) nameOverlay.addEventListener('click', (e) => { if (e.target === nameOverlay) window.closeNameAccessModal(); });
+            if (keyInput && keyError) keyInput.addEventListener('input', () => { if (keyInput.value.trim()) { keyInput.classList.remove('input-error'); keyError.style.display = 'none'; } });
+            if (nameInput && nameError) nameInput.addEventListener('input', () => { if (nameInput.value.trim()) { nameInput.classList.remove('input-error'); nameError.style.display = 'none'; } });
+            if (teamInput && teamError) teamInput.addEventListener('input', () => { if (teamInput.value.trim()) { teamInput.classList.remove('input-error'); teamError.style.display = 'none'; } });
+
+            document.addEventListener('keydown', function (e) {
+                if (keyOverlay && keyOverlay.classList.contains('open')) {
+                    if (e.key === 'Escape') window.closePrivateKeyAccessModal();
+                    if (e.key === 'Enter') window.submitPrivateKeyAccessModal();
+                    return;
+                }
+                if (nameOverlay && nameOverlay.classList.contains('open')) {
+                    if (e.key === 'Escape') window.closeNameAccessModal();
+                    if (e.key === 'Enter') window.submitNameAccessModal();
+                }
+            });
+
+            window.openPrivateKeyAccessModal();
+        });
+
+    </script>
+
+    {{if .RequiresKey}}
+    <div id="privateKeyModalOverlay" class="name-modal-overlay" aria-hidden="true">
+        <div class="name-modal" role="dialog" aria-modal="true" aria-labelledby="privateKeyModalTitle">
+            <div class="name-modal-header">
+                <h3 id="privateKeyModalTitle">Введите приватный ключ</h3>
+                <button type="button" class="name-modal-close" onclick="closePrivateKeyAccessModal()">×</button>
+            </div>
+            <div class="name-modal-body">
+                <p class="name-modal-subtitle">Этот квиз доступен только по приватному ключу</p>
+                <input id="privateKeyInput" class="name-modal-input" type="password" maxlength="128" placeholder="Приватный ключ" autocomplete="off">
+                <div id="privateKeyError" class="name-modal-error">Пожалуйста, введите приватный ключ.</div>
+            </div>
+            <div class="name-modal-actions">
+                <button type="button" class="name-modal-btn secondary" onclick="closePrivateKeyAccessModal()">Отмена</button>
+                <button type="button" class="name-modal-btn primary" onclick="submitPrivateKeyAccessModal()">Далее</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="nameModalOverlay" class="name-modal-overlay" aria-hidden="true">
+        <div class="name-modal" role="dialog" aria-modal="true" aria-labelledby="nameModalTitle">
+            <div class="name-modal-header">
+                <h3 id="nameModalTitle">Введите имя</h3>
+                <button type="button" class="name-modal-close" onclick="closeNameAccessModal()">×</button>
+            </div>
+            <div class="name-modal-body">
+                <p id="nameModalSubtitle" class="name-modal-subtitle">Укажите имя, под которым вы пройдёте квиз</p>
+                <input id="playerNameInput" class="name-modal-input" type="text" maxlength="64" placeholder="Например: John Johnson">
+                <div id="playerNameError" class="name-modal-error">Пожалуйста, введите имя.</div>
+                <div id="teamNameFieldWrap" style="display:none; margin-top:14px;">
+                    <input id="teamNameInput" class="name-modal-input" type="text" maxlength="64" placeholder="Название команды">
+                    <div id="teamNameError" class="name-modal-error">Пожалуйста, введите название команды.</div>
+                </div>
+                <div id="teamRouletteInfo" style="display:none; margin-top:12px; color:#475569; font-weight:600;">Участник будет случайно распределён по команде.</div>
+            </div>
+            <div class="name-modal-actions">
+                <button type="button" class="name-modal-btn secondary" onclick="closeNameAccessModal()">Отмена</button>
+                <button type="button" class="name-modal-btn primary" onclick="submitNameAccessModal()">Начать</button>
+            </div>
+        </div>
+    </div>
+    {{end}}
+
+</body>
+</html>

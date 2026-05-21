@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Вход - QuizHub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.97);
+            border-radius: 25px;
+            padding: 50px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 35px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            font-weight: 600;
+            text-align: center;
+            animation: slideIn 0.3s ease-out;
+            color: white;
+        }
+
+        .alert.error {
+            background: linear-gradient(45deg, #ff6b6b, #ff5252);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .alert.success {
+            background: linear-gradient(45deg, #48bb78, #38a169);
+            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.25);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+            padding-left: 5px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f9f9f9;
+            color: #333;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .links {
+            text-align: center;
+            margin-top: 28px;
+            color: #666;
+            font-size: 15px;
+        }
+
+        .links a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            padding: 5px 10px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .links a:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 480px) {
+            .login-card { padding: 35px 25px; border-radius: 20px; }
+            .title { font-size: 28px; }
+            .subtitle { font-size: 15px; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <div class="login-card">
+
+        <div class="logo-section">
+            <a class="logo" href="/">
+                <div class="logo-icon">Q</div>
+                <div class="logo-text">QuizHub</div>
+            </a>
+        </div>
+
+        <h1 class="title">Вход</h1>
+        <p class="subtitle">Войдите в аккаунт, чтобы создавать квизы и управлять ими</p>
+
+        {{if .Error}}
+        <div class="alert error">{{.Error}}</div>
+        {{end}}
+
+        {{if .Success}}
+        <div class="alert success">{{.Success}}</div>
+        {{end}}
+
+        <form method="post" action="/login">
+            <div class="form-group">
+                <label class="form-label" for="username">Имя пользователя</label>
+                <input class="form-input" type="text" id="username" name="username" required autocomplete="username">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Пароль</label>
+                <input class="form-input" type="password" id="password" name="password" required autocomplete="current-password">
+            </div>
+
+            <button class="submit-btn" type="submit">Войти</button>
+        </form>
+
+        <div class="links">
+            <a href="/register">Нет аккаунта? Зарегистрироваться</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

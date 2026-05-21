@@ -1,0 +1,1890 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>QuizHub — {{if .IsNew}}Создание{{else}}Редактирование{{end}} квиза</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .auth-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .logout-btn {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .logout-btn:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        .profile-menu {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .profile-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid rgba(102, 126, 234, 0.25);
+            background: rgba(255, 255, 255, 0.9);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        .profile-btn:hover {
+            transform: translateY(-2px);
+            border-color: rgba(102, 126, 234, 0.45);
+        }
+
+        .profile-btn .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            font-weight: 800;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: calc(100% + 12px);
+            right: 0;
+            width: 240px;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+            overflow: hidden;
+            transform: translateY(-6px);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s ease;
+            z-index: 20;
+        }
+
+        .profile-dropdown.open {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .profile-dropdown .drop-header {
+            padding: 18px 18px 14px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.12), rgba(118, 75, 162, 0.12));
+        }
+
+        .profile-dropdown .hello {
+            font-size: 14px;
+            color: #4a5568;
+            margin-bottom: 4px;
+        }
+
+        .profile-dropdown .drop-body {
+            padding: 12px 10px;
+        }
+
+        .profile-dropdown .drop-item {
+            display: block;
+            padding: 12px 12px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 600;
+            transition: background 0.2s ease;
+        }
+
+        .profile-dropdown .drop-item:hover {
+            background: rgba(102, 126, 234, 0.10);
+        }
+
+        .profile-dropdown .drop-submenu {
+            margin-top: 4px;
+        }
+
+        .profile-dropdown .drop-item-btn {
+            width: 100%;
+            background: transparent;
+            border: none;
+
+            padding: 12px 12px;
+            border-radius: 12px;
+            color: #333;
+            font-weight: 600;
+
+            font-family: inherit;
+            font-size: inherit;
+            line-height: inherit;
+
+            text-align: left;
+            cursor: pointer;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .profile-dropdown .drop-item-btn:hover {
+            background: rgba(102, 126, 234, 0.10);
+        }
+
+        .profile-dropdown .drop-submenu .chev {
+            opacity: 0.7;
+            font-weight: 800;
+            transition: transform 0.2s ease;
+        }
+
+        .profile-dropdown .drop-submenu.open .chev {
+            transform: rotate(180deg);
+        }
+
+        .profile-dropdown .submenu {
+            display: none;
+            padding: 6px 6px 0;
+        }
+
+        .profile-dropdown .drop-submenu.open .submenu {
+            display: block;
+        }
+
+        .profile-dropdown .drop-item.sub-item {
+            padding: 10px 12px;
+            margin-left: 6px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .profile-dropdown .drop-item.sub-item:hover {
+            background: rgba(102, 126, 234, 0.12);
+        }
+
+        .link-btn:hover { transform: translateY(-1px); }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 22px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.10);
+            margin-bottom: 18px;
+        }
+
+        h1 { font-size: 24px; margin-bottom: 10px; color: #2d2d2d; }
+        h2 { font-size: 18px; margin: 14px 0 10px; color: #2d2d2d; }
+        h3 { font-size: 16px; margin-bottom: 10px; color: #2d2d2d; }
+        .muted { color: #6b7280; font-size: 13px; line-height: 1.35; }
+
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+        @media (max-width: 900px) {
+            .row, .row-3 { grid-template-columns: 1fr; }
+        }
+
+        label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+        input[type="text"], input[type="number"], textarea, select {
+            width: 100%;
+            padding: 12px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            outline: none;
+            background: #fff;
+        }
+        textarea { min-height: 90px; resize: vertical; }
+
+        .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 14px; }
+        .btn {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: transform 0.08s ease;
+        }
+        .btn:hover { transform: translateY(-1px); }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-secondary { background: #e5e7eb; color: #111827; }
+        .btn-danger { background: #ef4444; color: white; }
+
+        .divider { height: 1px; background: rgba(0,0,0,0.08); margin: 14px 0; }
+
+        .question-item {
+            border: 1px solid rgba(0,0,0,0.10);
+            border-radius: 16px;
+            padding: 14px;
+            margin-top: 12px;
+            background: rgba(255,255,255,0.85);
+        }
+
+        .q-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        .q-badge {
+            display: inline-block;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #f3f4ff;
+            border: 1px solid rgba(102, 126, 234, 0.25);
+            color: #353a7a;
+            font-weight: 700;
+        }
+
+        .opt-row, .new-existing-option-row {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 10px;
+            align-items: center;
+            margin-top: 8px;
+        }
+        @media (max-width: 700px) {
+            .opt-row, .new-existing-option-row { grid-template-columns: 1fr; }
+        }
+
+        .checkbox {
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+            font-size: 13px;
+            color: #111827;
+            white-space: nowrap;
+        }
+        .small-btn {
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+        }
+        .small-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .small-secondary {
+            background: #e5e7eb;
+            color: #111827;
+        }
+
+        .small-primary {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .opt-preview {
+            width: 64px;
+            height: 64px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.12);
+        }
+
+        .pill {
+            display: inline-block;
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: rgba(17, 24, 39, 0.05);
+            border: 1px solid rgba(0,0,0,0.07);
+            color: #374151;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <a href="/" class="logo">
+            <div class="logo-icon">Q</div>
+            <div class="logo-text">QuizHub</div>
+        </a>
+
+        <div class="user-menu">
+            <a href="/logout" class="auth-btn logout-btn">Выйти</a>
+            <div class="profile-menu">
+                <button class="profile-btn" id="profileBtn" type="button" aria-haspopup="true" aria-expanded="false">
+                    <div class="avatar">
+                        {{printf "%.1s" .Username}}
+                    </div>
+                </button>
+
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="drop-header">
+                        <div class="hello">Привет, {{.Username}}</div>
+                    </div>
+
+                    <div class="drop-body">
+                        <a class="drop-item" href="/my-quizzes/{{.Username}}">Мои квизы</a>
+                        <a class="drop-item" href="/question-bank/{{.Username}}">Банк вопросов</a>
+                        <a class="drop-item" id="historyLink" href="/history/{{.Username}}">История</a>
+                        <div class="drop-submenu" id="profileSettings">
+                            <button class="drop-item drop-item-btn" id="profileSettingsBtn" type="button"
+                                    aria-haspopup="true" aria-expanded="false">
+                                <span>Настройки профиля</span>
+                                <span class="chev">▾</span>
+                            </button>
+
+                            <div class="submenu" id="profileSettingsMenu">
+                                <a class="drop-item sub-item" href="/profile/change-username">Изменить имя пользователя</a>
+                                <a class="drop-item sub-item" href="/profile/change-password">Изменить пароль</a>
+                            </div>
+                        </div>
+                        <a class="drop-item" href="/logout">Выйти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="card">
+        <h1>{{if .IsNew}}Создать квиз{{else}}Редактировать квиз{{end}}</h1>
+    </div>
+
+    <form method="POST" action="{{if .IsNew}}/edit-quiz{{else}}/edit-quiz/{{.Quiz.Id}}{{end}}" id="quiz-form">
+        <div class="card">
+            <h2>Параметры квиза</h2>
+
+            <div class="row">
+                <div>
+                    <label for="title">Название</label>
+                    <input id="title" type="text" name="title" value="{{.Quiz.Title}}" required>
+                </div>
+
+                <div>
+                    <label for="category">Категория</label>
+                    <select id="category" name="category" required>
+                        <option value="language_quiz" {{if eq .Quiz.Category "language_quiz"}}selected{{end}}>Языковой</option>
+                        <option value="math_quiz" {{if eq .Quiz.Category "math_quiz"}}selected{{end}}>Математика</option>
+                        <option value="astronomy_quiz" {{if eq .Quiz.Category "astronomy_quiz"}}selected{{end}}>Астрономия</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row-3" style="margin-top: 12px;">
+                <div>
+                    <label for="status">Статус</label>
+                    <select id="status" name="status" required>
+                        <option value="open" {{if eq .Quiz.Status "open"}}selected{{end}}>Открыт</option>
+                        <option value="closed" {{if eq .Quiz.Status "closed"}}selected{{end}}>Закрыт</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Доступ</label>
+                    <div class="checkbox" style="align-items:center; gap:12px; flex-wrap:wrap;">
+                        <label style="display:flex; align-items:center; gap:6px; font-weight:700; color:#374151;">
+                            <input type="radio" name="privacy" value="public" {{if ne .Quiz.Privacy "private"}}checked{{end}} onchange="togglePrivateKeyField()">
+                            Публичный
+                        </label>
+                        <label style="display:flex; align-items:center; gap:6px; font-weight:700; color:#374151;">
+                            <input type="radio" name="privacy" value="private" {{if eq .Quiz.Privacy "private"}}checked{{end}} onchange="togglePrivateKeyField()">
+                            Приватный
+                        </label>
+                    </div>
+                </div>
+
+                {{if .IsNew}}
+                <div>
+                    <label for="participation_mode">Режим прохождения</label>
+                    <select id="participation_mode" onchange="toggleParticipationModeFields()" required>
+                        <option value="individual" {{if eq .Quiz.ParticipationMode "individual"}}selected{{end}}>Индивидуальный</option>
+                        <option value="team_manual" {{if ne .Quiz.ParticipationMode "individual"}}selected{{end}}>Командный</option>
+                    </select>
+                    <input type="hidden" name="participation_mode" id="participation_mode_hidden" value="{{.Quiz.ParticipationMode}}">
+                </div>
+                {{else}}
+                <div>
+                    <label>Режим</label>
+                    <input type="text" value="{{if eq .Quiz.ParticipationMode "individual"}}Индивидуальный{{else}}Командный{{end}}" readonly>
+                    <div class="muted" style="margin-top:6px;">
+                        Режим нельзя изменить после создания квиза.
+                        {{if eq .Quiz.ParticipationMode "team_roulette"}} Случайное распределение по командам включено. Команды: 1–{{.Quiz.TeamCount}}.{{else if eq .Quiz.ParticipationMode "team_manual"}} Участники вводят название команды вручную.{{end}}
+                    </div>
+                </div>
+                {{end}}
+
+                <div>
+                    <label for="time_limit_display">Таймер (мм:сс)</label>
+                    <input id="time_limit_display" type="text" inputmode="numeric" value="" placeholder="00:00 = без ограничения">
+                    <input id="time_limit_seconds" type="hidden" name="time_limit_seconds" value="{{.Quiz.TimeLimitSeconds}}">
+                    <div class="muted" style="margin-top:6px;">Формат: минуты:секунды (например, 01:30)</div>
+                </div>
+                <div>
+                    <label for="pass_score">Порог прохождения (баллы)</label>
+                    <input id="pass_score" type="number" name="pass_score" min="0" value="{{.Quiz.PassScore}}" placeholder="0 = без порога">
+                </div>
+            </div>
+
+            <div id="privateKeyContainer" style="margin-top: 12px; display:none;">
+                <label for="private_key">Приватный ключ</label>
+                <input id="private_key" type="text" name="private_key" value="{{.Quiz.PrivateKey}}" placeholder="Введите ключ доступа">
+            </div>
+
+            {{if .IsNew}}
+            <div class="row" style="margin-top: 12px;">
+                <div id="randomTeamAssignmentContainer" style="display:none;">
+                    <label style="display:flex; align-items:center; gap:8px; font-weight:800; color:#374151;">
+                        <input type="checkbox" name="random_team_assignment" id="random_team_assignment" value="1" onchange="toggleParticipationModeFields()">
+                        Случайное распределение по командам
+                    </label>
+                </div>
+
+                <div id="teamCountContainer" style="display:none;">
+                    <label for="team_count">Количество команд</label>
+                    <input type="number" min="2" max="100" name="team_count" id="team_count" value="{{.Quiz.TeamCount}}" placeholder="Например: 4" disabled>
+                </div>
+            </div>
+            {{end}}
+
+            <div style="margin-top: 12px;">
+                <label for="description">Описание</label>
+                <textarea id="description" name="description" placeholder="Описание квиза...">{{.Quiz.Description}}</textarea>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-primary" type="submit">{{if .IsNew}}Создать квиз{{else}}Сохранить{{end}}</button>
+                <a class="btn btn-secondary" href="/my-quizzes/{{.Username}}" style="text-decoration:none; display:inline-block; text-align:center;">Отмена</a>
+            </div>
+        </div>
+
+        {{if .Questions}}
+        <div class="card">
+            <h2>Редактировать вопросы</h2>
+
+            {{range $index, $question := .Questions}}
+            <div class="question-item" id="existing-question-{{.Question.Id}}">
+                <input type="hidden" name="delete_question_{{.Question.Id}}" id="delete_question_{{.Question.Id}}" value="0">
+
+                <div class="q-head">
+                    <div>
+                        <h3 style="margin-bottom:4px;">Вопрос {{inc $index}}</h3>
+                    </div>
+                    <div>
+                        <button type="button" class="small-btn small-danger" onclick="markQuestionDeleted({{.Question.Id}})">Удалить вопрос</button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div style="grid-column: span 2;" id="existing-question-media-editor-{{.Question.Id}}">
+                        <label>Фото/видео над вопросом (необязательно)</label>
+                        <input type="hidden" name="question_media_url_{{.Question.Id}}" value="{{.Question.QuestionMediaURL}}">
+                        <input type="hidden" name="question_media_type_{{.Question.Id}}" value="{{.Question.QuestionMediaType}}">
+                        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:8px;">
+                            <input type="file" accept="image/*,video/*" onchange="uploadExistingQuestionMedia(this, {{.Question.Id}})">
+                            <button type="button" class="small-btn small-secondary" onclick="clearExistingQuestionMedia({{.Question.Id}})">Убрать медиа</button>
+                        </div>
+                        <div class="question-media-preview" style="margin-top:10px; {{if .Question.QuestionMediaURL}}display:block;{{else}}display:none;{{end}}">
+                            <img class="question-media-image" src="{{if eq .Question.QuestionMediaType "image"}}{{.Question.QuestionMediaURL}}{{end}}" {{if and .Question.QuestionMediaURL (eq .Question.QuestionMediaType "image")}}{{else}}style="display:none;"{{end}}>
+                            <video class="question-media-video" controls {{if and .Question.QuestionMediaURL (eq .Question.QuestionMediaType "video")}}src="{{.Question.QuestionMediaURL}}"{{else}}style="display:none;"{{end}}></video>
+                        </div>
+                    </div>
+
+                    <div class="question-text-wrap" style="grid-column: span 2;">
+                        <label>Текст вопроса</label>
+                        <input type="text" name="question_text_{{.Question.Id}}" value="{{.Question.Text}}" required>
+                    </div>
+                </div>
+
+                <div class="row-3" style="margin-top:12px;">
+                    <div>
+                        <label>Баллы</label>
+                        <input type="number" name="question_points_{{.Question.Id}}" value="{{.Question.Points}}" min="0" required>
+                    </div>
+                    <div>
+                        <label>Тип вопроса</label>
+                        <select name="question_type_{{.Question.Id}}"
+                                data-prev-type="{{.Question.Type}}"
+                                onchange="handleExistingQuestionTypeChange({{.Question.Id}})"
+                                required>
+                            <option value="single" {{if eq .Question.Type "single"}}selected{{end}}>Одиночный выбор</option>
+                            <option value="multiple" {{if eq .Question.Type "multiple"}}selected{{end}}>Множественный выбор</option>
+                            <option value="open" {{if eq .Question.Type "open"}}selected{{end}}>Открытый ответ</option>
+                            <option value="photo_single" {{if eq .Question.Type "photo_single"}}selected{{end}}>Фото-одиночный выбор</option>
+                            <option value="photo_multiple" {{if eq .Question.Type "photo_multiple"}}selected{{end}}>Фото-множественный выбор</option>
+                            <option value="video" {{if eq .Question.Type "video"}}selected{{end}}>Видео</option>
+                        </select>
+                    </div>
+                </div>
+
+                {{$qid := .Question.Id}}
+                {{$isPhotoOptions := or (eq .Question.Type "photo_single") (eq .Question.Type "photo_multiple")}}
+                <div id="existing-options-wrap-{{$qid}}" style="margin-top:12px; {{if or (eq .Question.Type "single") (eq .Question.Type "multiple") (eq .Question.Type "photo_single") (eq .Question.Type "photo_multiple")}}display:block;{{else}}display:none;{{end}}">
+                <div class="divider"></div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+                    <div>
+                        <h3 style="margin:0;">Варианты ответов</h3>
+                    </div>
+                    <button type="button" class="small-btn small-primary" onclick="addNewOptionToExisting({{$qid}})">+ Добавить вариант</button>
+                </div>
+
+                <div id="existing-options-list-{{$qid}}" style="margin-top: 10px;">
+                    {{range .Options}}
+                    <div class="opt-row" id="existing-option-row-{{.Id}}">
+                        <input type="hidden" name="delete_option_{{.Id}}" id="delete_option_{{.Id}}" value="0">
+
+                        <div>
+                            <div class="option-text-wrap" {{if $isPhotoOptions}}style="display:none;"{{end}}>
+                                <label>Текст варианта</label>
+                                <input type="text" name="option_text_{{$qid}}_{{.Id}}" value="{{.OptionText}}" {{if not $isPhotoOptions}}required{{end}}>
+                            </div>
+
+                            <input type="hidden" name="option_img_{{$qid}}_{{.Id}}" value="{{.ImageURL}}">
+                            <div class="option-media" style="display:{{if $isPhotoOptions}}flex{{else}}none{{end}}; align-items:center; gap:10px; flex-wrap:wrap; margin-top:8px;">
+                                <input type="file" accept="image/*" onchange="uploadOptionImageEdit(this, {{$qid}}, {{.Id}})">
+                                <img class="opt-preview" src="{{.ImageURL}}" {{if .ImageURL}}{{else}}style="display:none;"{{end}}>
+                                <button type="button" class="small-btn small-secondary" onclick="clearOptionImageEdit({{$qid}}, {{.Id}})">Убрать</button>
+                            </div>
+                        </div>
+
+                        <div class="checkbox" style="margin-top: 26px;">
+                            <input type="checkbox" name="option_correct_{{$qid}}_{{.Id}}" {{if .IsCorrect}}checked{{end}}
+                                   onchange="enforceSingleCorrectExisting({{$qid}}, this)">
+                            <span>правильный</span>
+                        </div>
+
+                        <div style="margin-top: 20px;">
+                            <button type="button" class="small-btn small-secondary" onclick="markOptionDeleted({{.Id}})">Удалить</button>
+                        </div>
+                    </div>
+                    {{end}}
+                </div>
+
+                <input type="hidden" name="existing_new_option_count_{{$qid}}" id="existing_new_option_count_{{$qid}}" value="0">
+                <div id="existing-new-options-{{$qid}}" style="margin-top: 10px;"></div>
+            </div>
+
+            <div id="existing-open-answer-wrap-{{$qid}}" class="existing-open-answer-wrap" style="margin-top:12px; {{if eq .Question.Type "open"}}display:block;{{else}}display:none;{{end}}">
+            <div class="divider"></div>
+            <label>Верные ответы для открытого вопроса</label>
+            <textarea name="open_answer_{{$qid}}" rows="3" placeholder="Каждый допустимый ответ — с новой строки">{{.OpenAnswersText}}</textarea>
+            <div class="muted" style="margin-top:6px;">Если оставить поле пустым, открытый вопрос не будет проверяться автоматически.</div>
+        </div>
+</div>
+{{end}}
+
+<div class="actions">
+    <button class="btn btn-primary" type="submit">{{if .IsNew}}Создать квиз{{else}}Сохранить{{end}}</button>
+</div>
+</div>
+
+{{end}}
+
+<div class="card">
+    <h2>{{if .IsNew}}Вопросы{{else}}Добавить новые вопросы{{end}}</h2>
+    <input type="hidden" name="new_total_questions" id="new_total_questions" value="0">
+    <div id="new-questions-container" style="margin-top: 12px;"></div>
+
+    <div class="actions">
+        <button type="button" class="btn btn-secondary" onclick="addNewQuestion()">+ Добавить вопрос</button>
+        <button type="button" class="btn btn-secondary" onclick="openBankImportEdit()">Импорт из банка</button>
+        <button class="btn btn-primary" type="submit">{{if .IsNew}}Создать квиз{{else}}Сохранить{{end}}</button>
+    </div>
+</div>
+</form>
+</div>
+
+<!-- Modal: Question Bank Import -->
+<div id="bankImportModalEdit" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:1000; align-items:center; justify-content:center; padding:20px;">
+    <div style="width:min(920px, 100%); background: rgba(255,255,255,0.98); border-radius: 18px; box-shadow:0 18px 40px rgba(0,0,0,0.22); overflow:hidden;">
+        <div style="padding:16px 18px; display:flex; justify-content:space-between; align-items:center; background: linear-gradient(135deg, rgba(102,126,234,0.12), rgba(118,75,162,0.12));">
+            <div style="font-weight:800; color:#1f2937;">Импорт из банка вопросов</div>
+            <button type="button" onclick="closeBankImportEdit()" style="border:none; background:transparent; font-size:20px; cursor:pointer;">×</button>
+        </div>
+        <div style="padding:16px 18px;">
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                <input id="bankSearchEdit" type="text" placeholder="Поиск..." style="flex:1; padding:12px 14px; border:2px solid #e9e9e9; border-radius:14px;" oninput="renderBankImportListEdit()">
+                <select id="bankCategoryEdit" onchange="renderBankImportListEdit()" style="min-width: 220px; padding:12px 14px; border:2px solid #e9e9e9; border-radius:14px;">
+                    <option value="all">Все категории</option>
+                    <option value="astronomy">Астрономия</option>
+                    <option value="language">Языковые</option>
+                    <option value="math">Математика</option>
+                    <option value="other">Другое</option>
+                </select>
+                <a href="/question-bank/" class="btn btn-secondary" style="padding:10px 16px; border-radius:50px;">Открыть банк</a>
+            </div>
+            <div id="bankImportListEdit" style="margin-top:12px; max-height: 55vh; overflow:auto; display:flex; flex-direction:column; gap:10px;"></div>
+            <div style="margin-top:14px; display:flex; justify-content:flex-end; gap:10px;">
+                <button type="button" class="btn btn-secondary" onclick="closeBankImportEdit()">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const EXISTING_COUNT = {{.ExistingCount}};
+</script>
+<script>
+
+    (function () {
+        const btn = document.getElementById('profileBtn');
+        const dd = document.getElementById('profileDropdown');
+
+        const settingsWrap = document.getElementById('profileSettings');
+        const settingsBtn = document.getElementById('profileSettingsBtn');
+
+        if (!btn || !dd) return;
+
+        const close = () => {
+            dd.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
+            if (settingsWrap) settingsWrap.classList.remove('open');
+        };
+
+        const toggle = () => {
+            const isOpen = dd.classList.contains('open');
+            if (isOpen) close();
+            else {
+                dd.classList.add('open');
+                btn.setAttribute('aria-expanded', 'true');
+            }
+        };
+
+        btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            toggle();
+        });
+
+        dd.addEventListener('click', function (e) {
+            e.stopPropagation();
+        });
+
+        if (settingsBtn && settingsWrap) {
+            settingsBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                settingsWrap.classList.toggle('open');
+            });
+        }
+
+        document.addEventListener('click', function () {
+            close();
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') close();
+        });
+    })();
+
+    function markQuestionDeleted(qid) {
+        if (!confirm('Удалить вопрос?')) return;
+        const hidden = document.getElementById('delete_question_' + qid);
+        const block = document.getElementById('existing-question-' + qid);
+        if (hidden) hidden.value = '1';
+        if (block) block.style.display = 'none';
+    }
+
+    function markOptionDeleted(optionId) {
+        if (!confirm('Удалить вариант ответа?')) return;
+        const hidden = document.getElementById('delete_option_' + optionId);
+        const row = document.getElementById('existing-option-row-' + optionId);
+        if (hidden) hidden.value = '1';
+        if (row) row.style.display = 'none';
+    }
+
+    function countImagesEdit(qid) {
+        const h1 = document.querySelectorAll(`input[type="hidden"][name^="option_img_${qid}_"]`);
+        const h2 = document.querySelectorAll(`input[type="hidden"][name^="existing_new_option_img_${qid}_"]`);
+        let c = 0;
+        [...h1, ...h2].forEach(h => { if ((h.value || '').trim() !== '') c++; });
+        return c;
+    }
+
+    async function uploadOptionImageEdit(fileInput, qid, optKey) {
+        const file = fileInput.files && fileInput.files[0];
+        if (!file) return;
+
+        let hiddenName = '';
+        if (String(optKey).startsWith('new_')) {
+            const i = String(optKey).replace('new_', '');
+            hiddenName = `existing_new_option_img_${qid}_${i}`;
+        } else {
+            hiddenName = `option_img_${qid}_${optKey}`;
+        }
+        const hidden = document.querySelector(`input[name="${hiddenName}"]`);
+        const hadBefore = hidden && (hidden.value || '').trim() !== '';
+        if (!hadBefore && countImagesEdit(qid) >= 4) {
+            alert('Можно добавить максимум 4 картинки на вопрос');
+            fileInput.value = '';
+            return;
+        }
+
+        const fd = new FormData();
+        fd.append('file', file);
+        try {
+            const resp = await fetch('/api/upload-option-image', { method: 'POST', body: fd });
+            const data = await resp.json();
+            if (!data || !data.ok) {
+                alert((data && data.error) ? data.error : 'Не удалось загрузить картинку');
+                fileInput.value = '';
+                return;
+            }
+            if (hidden) hidden.value = data.url;
+            const row = fileInput.closest('.opt-row') || (hidden ? hidden.closest('.opt-row') : null);
+            const img = row ? row.querySelector('img.opt-preview') : null;
+            if (img) {
+                img.src = data.url;
+                img.style.display = 'inline-block';
+            }
+        } catch (e) {
+            alert('Ошибка загрузки картинки');
+            fileInput.value = '';
+        }
+    }
+
+    function clearOptionImageEdit(qid, optKey) {
+        let hiddenName = '';
+        if (String(optKey).startsWith('new_')) {
+            const i = String(optKey).replace('new_', '');
+            hiddenName = `existing_new_option_img_${qid}_${i}`;
+        } else {
+            hiddenName = `option_img_${qid}_${optKey}`;
+        }
+        const hidden = document.querySelector(`input[name="${hiddenName}"]`);
+        if (hidden) hidden.value = '';
+        const row = (hidden ? hidden.closest('.opt-row') : null);
+        if (row) {
+            const img = row.querySelector('img.opt-preview');
+            if (img) {
+                img.src = '';
+                img.style.display = 'none';
+            }
+            const fi = row.querySelector('input[type="file"]');
+            if (fi) fi.value = '';
+        }
+    }
+
+    function countImagesInNewBlock(block) {
+        const imgs = block ? block.querySelectorAll('.new-options-list .nq-opt-img') : [];
+        let c = 0;
+        imgs.forEach(h => { if ((h.value || '').trim() !== '') c++; });
+        return c;
+    }
+
+    async function uploadNewOptImage(fileInput) {
+        const file = fileInput.files && fileInput.files[0];
+        if (!file) return;
+        const row = fileInput.closest('.new-opt-row');
+        const block = fileInput.closest('.new-question-block');
+        const hidden = row ? row.querySelector('.nq-opt-img') : null;
+        const hadBefore = hidden && (hidden.value || '').trim() !== '';
+        if (!hadBefore && countImagesInNewBlock(block) >= 4) {
+            alert('Можно добавить максимум 4 картинки на вопрос');
+            fileInput.value = '';
+            return;
+        }
+
+        const fd = new FormData();
+        fd.append('file', file);
+        try {
+            const resp = await fetch('/api/upload-option-image', { method: 'POST', body: fd });
+            const data = await resp.json();
+            if (!data || !data.ok) {
+                alert((data && data.error) ? data.error : 'Не удалось загрузить картинку');
+                fileInput.value = '';
+                return;
+            }
+            if (hidden) hidden.value = data.url;
+            const img = row ? row.querySelector('img.opt-preview') : null;
+            if (img) {
+                img.src = data.url;
+                img.style.display = 'inline-block';
+            }
+            rebuildNewQuestionsPayload();
+        } catch (e) {
+            alert('Ошибка загрузки картинки');
+            fileInput.value = '';
+        }
+    }
+
+    function clearNewOptImage(btn) {
+        const row = btn.closest('.new-opt-row');
+        if (!row) return;
+        const hidden = row.querySelector('.nq-opt-img');
+        if (hidden) hidden.value = '';
+        const img = row.querySelector('img.opt-preview');
+        if (img) {
+            img.src = '';
+            img.style.display = 'none';
+        }
+        const fi = row.querySelector('input[type="file"]');
+        if (fi) fi.value = '';
+        rebuildNewQuestionsPayload();
+    }
+
+    function renderMediaPreviewNodes(preview, img, video, url, type) {
+        const mediaUrl = (url || '').trim();
+        const mediaType = (type || '').trim().toLowerCase();
+        if (!preview || !img || !video) return;
+
+        if (!mediaUrl) {
+            preview.style.display = 'none';
+            img.src = '';
+            img.style.display = 'none';
+            video.pause();
+            video.removeAttribute('src');
+            video.load();
+            video.style.display = 'none';
+            return;
+        }
+
+        preview.style.display = 'block';
+        if (mediaType === 'video') {
+            img.src = '';
+            img.style.display = 'none';
+            video.src = mediaUrl;
+            video.style.display = 'block';
+        } else {
+            video.pause();
+            video.removeAttribute('src');
+            video.load();
+            video.style.display = 'none';
+            img.src = mediaUrl;
+            img.style.display = 'block';
+        }
+    }
+
+    function getExistingQuestionMediaEls(qid) {
+        const block = document.getElementById('existing-question-media-editor-' + qid);
+        if (!block) return null;
+        return {
+            block,
+            urlInput: block.querySelector(`input[name="question_media_url_${qid}"]`),
+            typeInput: block.querySelector(`input[name="question_media_type_${qid}"]`),
+            fileInput: block.querySelector('input[type="file"]'),
+            preview: block.querySelector('.question-media-preview'),
+            img: block.querySelector('.question-media-image'),
+            video: block.querySelector('.question-media-video')
+        };
+    }
+
+    function renderExistingQuestionMediaPreview(qid, url, type) {
+        const els = getExistingQuestionMediaEls(qid);
+        if (!els) return;
+        const mediaUrl = (url || '').trim();
+        const mediaType = mediaUrl ? ((type || '').trim().toLowerCase() === 'video' ? 'video' : 'image') : '';
+        if (els.urlInput) els.urlInput.value = mediaUrl;
+        if (els.typeInput) els.typeInput.value = mediaType;
+        renderMediaPreviewNodes(els.preview, els.img, els.video, mediaUrl, mediaType);
+    }
+
+    async function uploadExistingQuestionMedia(fileInput, qid) {
+        const file = fileInput.files && fileInput.files[0];
+        if (!file) return;
+        const fd = new FormData();
+        fd.append('file', file);
+        try {
+            const resp = await fetch('/api/upload-question-media', { method: 'POST', body: fd });
+            const data = await resp.json();
+            if (!data || !data.ok || !data.url) {
+                alert((data && data.error) ? data.error : 'Не удалось загрузить медиа');
+                fileInput.value = '';
+                return;
+            }
+            renderExistingQuestionMediaPreview(qid, data.url || '', data.media_type || 'image');
+        } catch (e) {
+            alert('Ошибка загрузки медиа');
+            fileInput.value = '';
+        }
+    }
+
+    function clearExistingQuestionMedia(qid) {
+        const els = getExistingQuestionMediaEls(qid);
+        if (!els) return;
+        renderExistingQuestionMediaPreview(qid, '', '');
+        if (els.fileInput) els.fileInput.value = '';
+    }
+
+    function getNewQuestionMediaEls(block) {
+        if (!block) return null;
+        const editor = block.querySelector('.new-question-media-editor');
+        if (!editor) return null;
+        return {
+            block,
+            editor,
+            urlInput: editor.querySelector('.nq-media-url'),
+            typeInput: editor.querySelector('.nq-media-type'),
+            fileInput: editor.querySelector('input[type="file"]'),
+            preview: editor.querySelector('.question-media-preview'),
+            img: editor.querySelector('.question-media-image'),
+            video: editor.querySelector('.question-media-video')
+        };
+    }
+
+    function renderNewQuestionMediaPreview(block, url, type) {
+        const els = getNewQuestionMediaEls(block);
+        if (!els) return;
+        const mediaUrl = (url || '').trim();
+        const mediaType = mediaUrl ? ((type || '').trim().toLowerCase() === 'video' ? 'video' : 'image') : '';
+        if (els.urlInput) els.urlInput.value = mediaUrl;
+        if (els.typeInput) els.typeInput.value = mediaType;
+        renderMediaPreviewNodes(els.preview, els.img, els.video, mediaUrl, mediaType);
+        rebuildNewQuestionsPayload();
+    }
+
+    async function uploadNewQuestionMedia(fileInput) {
+        const file = fileInput.files && fileInput.files[0];
+        if (!file) return;
+        const block = fileInput.closest('.new-question-block');
+        const fd = new FormData();
+        fd.append('file', file);
+        try {
+            const resp = await fetch('/api/upload-question-media', { method: 'POST', body: fd });
+            const data = await resp.json();
+            if (!data || !data.ok || !data.url) {
+                alert((data && data.error) ? data.error : 'Не удалось загрузить медиа');
+                fileInput.value = '';
+                return;
+            }
+            renderNewQuestionMediaPreview(block, data.url || '', data.media_type || 'image');
+        } catch (e) {
+            alert('Ошибка загрузки медиа');
+            fileInput.value = '';
+        }
+    }
+
+    function clearNewQuestionMedia(btn) {
+        const block = btn.closest('.new-question-block');
+        const els = getNewQuestionMediaEls(block);
+        if (!els) return;
+        renderNewQuestionMediaPreview(block, '', '');
+        if (els.fileInput) els.fileInput.value = '';
+    }
+
+    function isPhotoChoiceType(t) {
+        return t === 'photo_single' || t === 'photo_multiple';
+    }
+
+    function refreshEditOptionModeForQuestion(qid) {
+        const sel = document.querySelector('select[name="question_type_' + qid + '"]');
+        const qType = sel ? sel.value : 'single';
+        const isPhoto = isPhotoChoiceType(qType);
+        const scope = document.getElementById('existing-question-' + qid) || document;
+
+        scope.querySelectorAll('.opt-row').forEach((row, idx) => {
+            let numLabel = row.querySelector('.photo-option-number');
+            if (!numLabel) {
+                numLabel = document.createElement('div');
+                numLabel.className = 'photo-option-number';
+                numLabel.style.fontWeight = '700';
+                numLabel.style.marginBottom = '6px';
+                numLabel.style.display = 'none';
+                const firstCol = row.querySelector('div');
+                if (firstCol) firstCol.insertBefore(numLabel, firstCol.firstChild);
+            }
+            if (numLabel) {
+                numLabel.textContent = 'Вариант ' + (idx + 1);
+                numLabel.style.display = isPhoto ? 'block' : 'none';
+            }
+
+            row.querySelectorAll('input[type="text"]').forEach(inp => {
+                inp.required = !isPhoto;
+                inp.style.display = isPhoto ? 'none' : '';
+            });
+            row.querySelectorAll('.option-text-wrap').forEach(w => {
+                w.style.display = isPhoto ? 'none' : '';
+            });
+        });
+
+        scope.querySelectorAll('.opt-row div input[type="file"]').forEach(fi => { const wrap = fi.parentElement; if (wrap) wrap.style.display = isPhoto ? 'flex' : 'none'; });
+    }
+
+    function shouldShowQuestionTextByType(t) {
+        return t === 'single' || t === 'multiple' || t === 'open' || t === 'photo_single' || t === 'photo_multiple';
+    }
+
+    function refreshExistingQuestionTextVisibility(qid) {
+        const block = document.getElementById('existing-question-' + qid);
+        if (!block) return;
+
+        const sel = block.querySelector('select[name="question_type_' + qid + '"]');
+        const wrap = block.querySelector('.question-text-wrap');
+        const input = wrap ? wrap.querySelector('input[type="text"]') : null;
+        if (!sel || !wrap || !input) return;
+
+        const show = shouldShowQuestionTextByType(sel.value);
+        wrap.style.display = show ? '' : 'none';
+        input.required = show;
+    }
+
+    function refreshExistingOpenAnswerVisibility(qid) {
+        const block = document.getElementById('existing-question-' + qid);
+        if (!block) return;
+
+        const sel = block.querySelector('select[name="question_type_' + qid + '"]');
+        const wrap = document.getElementById('existing-open-answer-wrap-' + qid);
+        const textarea = wrap ? wrap.querySelector('textarea') : null;
+        if (!sel || !wrap || !textarea) return;
+
+        const show = sel.value === 'open';
+        wrap.style.display = show ? 'block' : 'none';
+        textarea.disabled = !show;
+    }
+
+    function refreshNewQuestionTextVisibility(block) {
+        if (!block) return;
+
+        const sel = block.querySelector('.nq-type');
+        const wrap = block.querySelector('.question-text-wrap');
+        const input = block.querySelector('.nq-text');
+        if (!sel || !wrap || !input) return;
+
+        const show = shouldShowQuestionTextByType(sel.value);
+        wrap.style.display = show ? '' : 'none';
+        input.required = show;
+    }
+
+    function refreshNewOpenAnswerVisibility(block) {
+        if (!block) return;
+
+        const sel = block.querySelector('.nq-type');
+        const wrap = block.querySelector('.new-open-answer-wrap');
+        const textarea = block.querySelector('.nq-open-answer');
+        if (!sel || !wrap || !textarea) return;
+
+        const show = sel.value === 'open';
+        wrap.style.display = show ? 'block' : 'none';
+        textarea.disabled = !show;
+    }
+
+    function refreshNewOptionMode(block) {
+        if (!block) return;
+
+        const typeSel = block.querySelector('.nq-type');
+        const isPhoto = isPhotoChoiceType(typeSel ? typeSel.value : 'single');
+
+        block.querySelectorAll('.new-opt-row').forEach((row, idx) => {
+            let numLabel = row.querySelector('.photo-option-number');
+            if (!numLabel) {
+                numLabel = document.createElement('div');
+                numLabel.className = 'photo-option-number';
+                numLabel.style.fontWeight = '700';
+                numLabel.style.marginBottom = '6px';
+                numLabel.style.display = 'none';
+                const firstCol = row.querySelector('div');
+                if (firstCol) firstCol.insertBefore(numLabel, firstCol.firstChild);
+            }
+            if (numLabel) {
+                numLabel.textContent = 'Вариант ' + (idx + 1);
+                numLabel.style.display = isPhoto ? 'block' : 'none';
+            }
+
+            row.querySelectorAll('.option-text-wrap').forEach(el => {
+                el.style.display = isPhoto ? 'none' : '';
+            });
+            row.querySelectorAll('input[type="text"]').forEach(inp => {
+                inp.required = !isPhoto;
+                inp.style.display = isPhoto ? 'none' : '';
+            });
+            row.querySelectorAll('.option-media').forEach(el => {
+                el.style.display = isPhoto ? 'flex' : 'none';
+            });
+        });
+    }
+
+    function handleExistingQuestionTypeChange(qid) {
+        const sel = document.querySelector('select[name="question_type_' + qid + '"]');
+        const wrap = document.getElementById('existing-options-wrap-' + qid);
+        if (!sel || !wrap) return;
+
+        const prev = sel.getAttribute('data-prev-type') || '';
+        const next = sel.value;
+
+        const prevHadOptions = (prev === 'single' || prev === 'multiple' || prev === 'photo_single' || prev === 'photo_multiple');
+        const nextHasOptions = (next === 'single' || next === 'multiple' || next === 'photo_single' || next === 'photo_multiple');
+
+        if (prevHadOptions && !nextHasOptions) {
+            const ok = confirm('Вы меняете тип на open/video. Варианты ответов будут удалены после сохранения. Продолжить?');
+            if (!ok) {
+                sel.value = prev;
+                return;
+            }
+        }
+
+        wrap.style.display = nextHasOptions ? 'block' : 'none';
+        sel.setAttribute('data-prev-type', next);
+        refreshEditOptionModeForQuestion(qid);
+        refreshExistingQuestionTextVisibility(qid);
+        refreshExistingOpenAnswerVisibility(qid);
+    }
+
+
+    function enforceSingleCorrectExisting(qid, changedCheckbox) {
+        const sel = document.querySelector('select[name="question_type_' + qid + '"]');
+        if (!sel || sel.value !== 'single' && sel.value !== 'photo_single') return;
+        if (!changedCheckbox.checked) return;
+
+        const wrap = document.getElementById('existing-options-wrap-' + qid);
+        if (!wrap) return;
+
+        wrap.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+            if (cb !== changedCheckbox) cb.checked = false;
+        });
+    }
+
+    function rebuildNewExistingOptions(qid) {
+        const list = document.getElementById('existing-new-options-' + qid);
+        const cnt = document.getElementById('existing_new_option_count_' + qid);
+        if (!list || !cnt) return;
+
+        const rows = Array.from(list.querySelectorAll('.new-existing-option-row'));
+        rows.forEach((row, idx) => {
+            const i = idx + 1;
+            const txt = row.querySelector('input[type="text"]');
+            const imgHidden = row.querySelector('input[type="hidden"]');
+            const fileInput = row.querySelector('input[type="file"]');
+            const clearBtn = row.querySelector('button[data-clear-img="1"]');
+            const cb = row.querySelector('input[type="checkbox"]');
+            if (txt) txt.name = 'existing_new_option_text_' + qid + '_' + i;
+            if (imgHidden) imgHidden.name = 'existing_new_option_img_' + qid + '_' + i;
+            if (fileInput) fileInput.setAttribute('onchange', 'uploadOptionImageEdit(this, ' + qid + ', "new_' + i + '")');
+            if (clearBtn) clearBtn.setAttribute('onclick', 'clearOptionImageEdit(' + qid + ', "new_' + i + '")');
+            if (cb) cb.name = 'existing_new_option_correct_' + qid + '_' + i;
+        });
+        cnt.value = String(rows.length);
+    }
+
+    function addNewOptionToExisting(qid) {
+        const sel = document.querySelector('select[name="question_type_' + qid + '"]');
+        if (!sel || (sel.value !== 'single' && sel.value !== 'multiple' && sel.value !== 'photo_single' && sel.value !== 'photo_multiple')) {
+            alert('Варианты доступны только для типов выбора (включая фото-типы).');
+            return;
+        }
+        const list = document.getElementById('existing-new-options-' + qid);
+        if (!list) return;
+
+        const isPhoto = isPhotoChoiceType(sel.value);
+        const row = document.createElement('div');
+        row.className = 'opt-row new-existing-option-row';
+        row.innerHTML = `
+        <div>
+            <div class="option-text-wrap" style="${isPhoto ? 'display:none;' : ''}">
+                <label>Новый вариант</label>
+                <input type="text" ${isPhoto ? '' : 'required'} placeholder="Введите текст варианта">
+            </div>
+
+            <input type="hidden" value="">
+            <div class="option-media" style="display:${isPhoto ? 'flex' : 'none'}; align-items:center; gap:10px; flex-wrap:wrap; margin-top:8px;">
+                <input type="file" accept="image/*">
+                <img class="opt-preview" style="display:none;">
+                <button type="button" class="small-btn small-secondary" data-clear-img="1">Убрать</button>
+            </div>
+        </div>
+        <div class="checkbox" style="margin-top: 26px;">
+            <input type="checkbox">
+            <span>правильный</span>
+        </div>
+        <div style="margin-top: 20px;">
+            <button type="button" class="small-btn small-secondary" data-delete-option="1">Удалить</button>
+        </div>
+    `;
+
+        const cb = row.querySelector('input[type="checkbox"]');
+        if (cb) cb.addEventListener('change', () => enforceSingleCorrectExisting(qid, cb));
+
+        const del = row.querySelector('button[data-delete-option="1"]');
+        if (del) {
+            del.addEventListener('click', () => {
+                row.remove();
+                rebuildNewExistingOptions(qid);
+                refreshEditOptionModeForQuestion(qid);
+            });
+        }
+
+        list.appendChild(row);
+        rebuildNewExistingOptions(qid);
+        refreshEditOptionModeForQuestion(qid);
+    }
+
+    let newQuestionCounter = 0;
+
+    function addNewQuestion() {
+        newQuestionCounter++;
+        const container = document.getElementById('new-questions-container');
+        const block = document.createElement('div');
+        block.className = 'question-item new-question-block';
+        block.setAttribute('data-new-q', String(newQuestionCounter));
+
+        block.innerHTML = `
+        <div class="q-head">
+            <div>
+                <h3 style="margin-bottom:4px;">
+                    Вопрос <span class="new-q-num"></span>
+                    <span class="q-badge new-q-badge"></span>
+                </h3>
+            </div>
+            <div>
+                <button type="button" class="small-btn small-danger" onclick="removeNewQuestion(this)">Удалить</button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div style="grid-column: span 2;" class="new-question-media-editor">
+                <label>Фото/видео над вопросом (необязательно)</label>
+                <input type="hidden" class="nq-media-url" value="">
+                <input type="hidden" class="nq-media-type" value="">
+                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:8px;">
+                    <input type="file" accept="image/*,video/*" onchange="uploadNewQuestionMedia(this)">
+                    <button type="button" class="small-btn small-secondary" onclick="clearNewQuestionMedia(this)">Убрать медиа</button>
+                </div>
+                <div class="question-media-preview" style="display:none; margin-top:10px;">
+                    <img class="question-media-image" style="display:none; max-width:100%; max-height:280px; border-radius:14px; border:1px solid rgba(0,0,0,0.08);">
+                    <video class="question-media-video" controls style="display:none; width:100%; max-height:280px; border-radius:14px; border:1px solid rgba(0,0,0,0.08);"></video>
+                </div>
+            </div>
+
+            <div style="grid-column: span 2;" class="question-text-wrap">
+                <label>Текст вопроса</label>
+                <input type="text" class="nq-text" required placeholder="Введите текст вопроса">
+            </div>
+        </div>
+
+        <div class="row-3" style="margin-top:12px;">
+            <div>
+                <label>Баллы</label>
+                <input type="number" class="nq-points" min="0" value="1" required>
+            </div>
+            <div>
+                <label>Тип вопроса</label>
+                <select class="nq-type" onchange="handleNewQuestionTypeChange(this)">
+                    <option value="single">Одиночный выбор</option>
+                    <option value="multiple">Множественный выбор</option>
+                    <option value="open">Открытый ответ</option>
+                    <option value="photo_single">Фото-одиночный выбор</option>
+                            <option value="photo_multiple">Фото-множественный выбор</option>
+                    <option value="video">Видео</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="new-options-wrap" style="margin-top: 12px;">
+            <div class="divider"></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+                <div>
+                    <h3 style="margin:0;">Варианты ответов</h3>
+                </div>
+                <button type="button" class="small-btn small-primary" onclick="addOptionToNewQuestion(this)">+ Добавить вариант</button>
+            </div>
+            <div class="new-options-list" style="margin-top:10px;"></div>
+        </div>
+
+        <div class="new-open-answer-wrap" style="display:none; margin-top:12px;">
+            <div class="divider"></div>
+            <label>Верные ответы для открытого вопроса</label>
+            <textarea class="nq-open-answer" rows="3" placeholder="Каждый допустимый ответ — с новой строки"></textarea>
+            <div class="muted" style="margin-top:6px;">Если оставить поле пустым, открытый вопрос не будет проверяться автоматически.</div>
+        </div>
+    `;
+
+        container.appendChild(block);
+        refreshNewQuestionTextVisibility(block);
+        refreshNewOpenAnswerVisibility(block);
+        addOptionToNewQuestion(block.querySelector('.small-btn.small-primary'));
+        addOptionToNewQuestion(block.querySelector('.small-btn.small-primary'));
+
+        rebuildNewQuestionsPayload();
+    }
+
+    function removeNewQuestion(btn) {
+        const block = btn.closest('.new-question-block');
+        if (!block) return;
+        block.remove();
+        rebuildNewQuestionsPayload();
+    }
+
+    function handleNewQuestionTypeChange(selectEl) {
+        const block = selectEl.closest('.new-question-block');
+        if (!block) return;
+        const wrap = block.querySelector('.new-options-wrap');
+        if (!wrap) return;
+
+        const t = selectEl.value;
+        const hasOptions = (t === 'single' || t === 'multiple' || t === 'photo_single' || t === 'photo_multiple');
+        wrap.style.display = hasOptions ? 'block' : 'none';
+
+        if (!hasOptions) {
+            const list = block.querySelector('.new-options-list');
+            if (list) list.innerHTML = '';
+        } else {
+            const list = block.querySelector('.new-options-list');
+            if (list && list.children.length === 0) {
+                addOptionToNewQuestion(block.querySelector('.small-btn.small-primary'));
+                addOptionToNewQuestion(block.querySelector('.small-btn.small-primary'));
+            }
+        }
+        refreshNewQuestionTextVisibility(block);
+        refreshNewOpenAnswerVisibility(block);
+        refreshNewOptionMode(block);
+        rebuildNewQuestionsPayload();
+    }
+
+    function enforceSingleCorrectNew(block, changedCheckbox) {
+        const typeSel = block.querySelector('.nq-type');
+        if (!typeSel || typeSel.value !== 'single' && typeSel.value !== 'photo_single') return;
+        if (!changedCheckbox.checked) return;
+
+        block.querySelectorAll('.new-options-list input[type="checkbox"]').forEach(cb => {
+            if (cb !== changedCheckbox) cb.checked = false;
+        });
+    }
+
+    function addOptionToNewQuestion(btn) {
+        const block = btn.closest('.new-question-block');
+        if (!block) return;
+
+        const typeSel = block.querySelector('.nq-type');
+        if (typeSel && (typeSel.value !== 'single' && typeSel.value !== 'multiple' && typeSel.value !== 'photo_single' && typeSel.value !== 'photo_multiple')) {
+            alert('Варианты доступны только для типов выбора (включая фото-типы).');
+            return;
+        }
+
+        const list = block.querySelector('.new-options-list');
+        if (!list) return;
+
+        const isPhoto = isPhotoChoiceType((block.querySelector('.nq-type')||{}).value);
+        const row = document.createElement('div');
+        row.className = 'opt-row new-opt-row';
+        row.innerHTML = `
+        <div>
+            <div class="option-text-wrap" style="${isPhoto ? 'display:none;' : ''}">
+            <label>Текст варианта</label>
+            <input type="text" class="nq-opt-text" ${isPhoto ? '' : 'required'} placeholder="Введите текст...">
+            </div>
+
+            <input type="hidden" class="nq-opt-img" value="">
+            <div class="option-media" style="display:${isPhoto ? 'flex' : 'none'}; align-items:center; gap:10px; flex-wrap:wrap; margin-top:8px;">
+                <input type="file" accept="image/*" onchange="uploadNewOptImage(this)">
+                <img class="opt-preview" style="display:none;">
+                <button type="button" class="small-btn small-secondary" onclick="clearNewOptImage(this)">Убрать</button>
+            </div>
+        </div>
+        <div class="checkbox" style="margin-top: 26px;">
+            <input type="checkbox" class="nq-opt-correct">
+            <span>правильный</span>
+        </div>
+        <div style="margin-top: 20px;">
+            <button type="button" class="small-btn small-secondary" data-delete-option="1">Удалить</button>
+        </div>
+    `;
+
+        const cb = row.querySelector('.nq-opt-correct');
+        if (cb) cb.addEventListener('change', () => enforceSingleCorrectNew(block, cb));
+
+        const del = row.querySelector('button[data-delete-option="1"]');
+        if (del) del.addEventListener('click', () => {
+            row.remove();
+            refreshNewOptionMode(block);
+            rebuildNewQuestionsPayload();
+        });
+
+        list.appendChild(row);
+        refreshNewOptionMode(block);
+        rebuildNewQuestionsPayload();
+    }
+
+    function rebuildNewQuestionsPayload() {
+        document.querySelectorAll('.generated-new-hidden').forEach(n => n.remove());
+
+        const blocks = Array.from(document.querySelectorAll('.new-question-block'));
+        const totalEl = document.getElementById('new_total_questions');
+        if (totalEl) totalEl.value = String(blocks.length);
+
+        blocks.forEach((block, idx) => {
+            const i = idx + 1;
+
+            const qText = block.querySelector('.nq-text');
+            const qPts = block.querySelector('.nq-points');
+            const qType = block.querySelector('.nq-type');
+            const qMediaUrl = block.querySelector('.nq-media-url');
+            const qMediaType = block.querySelector('.nq-media-type');
+            const qOpenAnswer = block.querySelector('.nq-open-answer');
+
+            appendHidden(block, 'new_question_text_' + i, qText ? qText.value : '');
+            appendHidden(block, 'new_question_points_' + i, qPts ? qPts.value : '0');
+            appendHidden(block, 'new_question_type_' + i, qType ? qType.value : 'open');
+            appendHidden(block, 'new_question_media_url_' + i, qMediaUrl ? (qMediaUrl.value || '') : '');
+            appendHidden(block, 'new_question_media_type_' + i, qMediaType ? (qMediaType.value || '') : '');
+            if (qType && qType.value === 'open') {
+                appendHidden(block, 'new_open_answer_' + i, qOpenAnswer ? qOpenAnswer.value : '');
+            }
+
+            const hasOptions = qType && (qType.value === 'single' || qType.value === 'multiple' || qType.value === 'photo_single' || qType.value === 'photo_multiple');
+            const optRows = hasOptions ? Array.from(block.querySelectorAll('.new-options-list .new-opt-row')) : [];
+            appendHidden(block, 'new_option_count_' + i, String(optRows.length));
+
+            optRows.forEach((row, jdx) => {
+                const j = jdx + 1;
+                const txt = row.querySelector('.nq-opt-text');
+                const cb = row.querySelector('.nq-opt-correct');
+                const img = row.querySelector('.nq-opt-img');
+                appendHidden(block, 'new_option_' + i + '_' + j, txt ? txt.value : '');
+                appendHidden(block, 'new_option_img_' + i + '_' + j, img ? (img.value || '') : '');
+                if (cb && cb.checked) {
+                    appendHidden(block, 'new_is_correct_' + i + '_' + j, '1');
+                }
+            });
+        });
+        blocks.forEach((block, idx) => {
+            const seq = (typeof EXISTING_COUNT === 'number' ? EXISTING_COUNT : 0) + idx + 1;
+
+            const numEl = block.querySelector('.new-q-num');
+            const badgeEl = block.querySelector('.new-q-badge');
+
+            if (numEl) numEl.textContent = String(seq);
+            if (badgeEl) badgeEl.textContent = '#' + String(seq);
+        });
+    }
+
+    function appendHidden(block, name, value) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        input.className = 'generated-new-hidden';
+        block.appendChild(input);
+    }
+
+    (function () {
+        const form = document.getElementById('quiz-form') || document.querySelector('form[action^="/edit-quiz"]');
+        if (form) {
+            form.addEventListener('submit', function () {
+                rebuildNewQuestionsPayload();
+            });
+        }
+
+        document.addEventListener('input', function (e) {
+            if (e.target && e.target.closest && e.target.closest('.new-question-block')) {
+                rebuildNewQuestionsPayload();
+            }
+        });
+
+        document.addEventListener('change', function (e) {
+            if (e.target && e.target.closest && e.target.closest('.new-question-block')) {
+                rebuildNewQuestionsPayload();
+            }
+        });
+    })();
+
+    let __bankCacheEdit = null;
+
+    function openBankImportEdit() {
+        const modal = document.getElementById('bankImportModalEdit');
+        if (modal) modal.style.display = 'flex';
+        if (__bankCacheEdit) {
+            renderBankImportListEdit();
+            return;
+        }
+        fetch('/question-bank/?action=list', {
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data && data.ok) {
+                    __bankCacheEdit = (data.items || []);
+                    renderBankImportListEdit();
+                } else {
+                    alert((data && data.error) ? data.error : 'Не удалось загрузить банк вопросов');
+                }
+            })
+            .catch(() => alert('Не удалось загрузить банк вопросов'));
+    }
+
+    function closeBankImportEdit() {
+        const modal = document.getElementById('bankImportModalEdit');
+        if (modal) modal.style.display = 'none';
+    }
+
+    function renderBankImportListEdit() {
+        const list = document.getElementById('bankImportListEdit');
+        if (!list) return;
+        list.innerHTML = '';
+
+        const q = (document.getElementById('bankSearchEdit')?.value || '').trim().toLowerCase();
+        const cat = (document.getElementById('bankCategoryEdit')?.value || 'all').trim().toLowerCase();
+
+        const items = (__bankCacheEdit || []).filter(it => {
+            const t = (it.Question?.Text || '').toLowerCase();
+            const c = (it.Question?.Category || 'other').toLowerCase();
+            const okText = (q === '' || t.includes(q));
+            const okCat = (cat === 'all' || c === cat);
+            return okText && okCat;
+        });
+
+        if (items.length === 0) {
+            const empty = document.createElement('div');
+            empty.style.padding = '12px 14px';
+            empty.style.borderRadius = '14px';
+            empty.style.background = 'rgba(255,255,255,0.95)';
+            empty.style.border = '1px solid rgba(0,0,0,0.06)';
+            empty.textContent = 'Нет вопросов для показа.';
+            list.appendChild(empty);
+            return;
+        }
+
+        items.forEach(it => {
+            const qObj = it.Question || {};
+            const card = document.createElement('div');
+            card.style.border = '1px solid rgba(0,0,0,0.06)';
+            card.style.borderRadius = '16px';
+            card.style.background = 'rgba(255,255,255,0.98)';
+            card.style.padding = '12px 14px';
+            card.style.display = 'flex';
+            card.style.gap = '12px';
+            card.style.alignItems = 'flex-start';
+            card.style.justifyContent = 'space-between';
+
+            const left = document.createElement('div');
+            left.style.flex = '1';
+            left.innerHTML = `
+                <div style="font-weight:800; color:#1f2937;">#${qObj.Id} • ${escapeHtmlBank(qObj.Text || '')}</div>
+                <div style="margin-top:6px; display:flex; gap:8px; flex-wrap:wrap;">
+                    <span style="font-size:12px; font-weight:800; padding:4px 10px; border-radius:999px; background: rgba(102,126,234,0.12); color:#374151;">${escapeHtmlBank(qObj.Type || '')}</span>
+                    <span style="font-size:12px; font-weight:800; padding:4px 10px; border-radius:999px; background: rgba(16,185,129,0.12); color:#065f46;">${Number(qObj.Points || 0)} балл(ов)</span>
+                    <span style="font-size:12px; font-weight:800; padding:4px 10px; border-radius:999px; background: rgba(245,158,11,0.14); color:#92400e;">${escapeHtmlBank(bankCategoryLabel(qObj.Category || 'other'))}</span>
+                </div>
+            `;
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn btn-secondary';
+            btn.textContent = 'Добавить';
+            btn.onclick = () => { importBankQuestionToEdit(it); };
+
+            card.appendChild(left);
+            card.appendChild(btn);
+            list.appendChild(card);
+        });
+    }
+
+    function importBankQuestionToEdit(item) {
+        if (!item || !item.Question) return;
+
+        addNewQuestion();
+        const blocks = Array.from(document.querySelectorAll('.new-question-block'));
+        const block = blocks[blocks.length - 1];
+        if (!block) return;
+
+        const qText = block.querySelector('.nq-text');
+        const qPts = block.querySelector('.nq-points');
+        const qType = block.querySelector('.nq-type');
+
+        if (qText) qText.value = item.Question.Text || '';
+        if (qPts) qPts.value = String(item.Question.Points ?? 1);
+        if (qType) qType.value = item.Question.Type || 'single';
+        renderNewQuestionMediaPreview(block, item.Question.QuestionMediaURL || item.Question.QuestionImageURL || '', item.Question.QuestionMediaType || '');
+
+        handleNewQuestionTypeChange(qType);
+
+        const t = item.Question.Type || 'single';
+        const isPhoto = isPhotoChoiceType(t);
+        const qOpenAnswer = block.querySelector('.nq-open-answer');
+        if (qOpenAnswer && t === 'open') {
+            qOpenAnswer.value = typeof item.OpenAnswersText === 'string' ? item.OpenAnswersText : '';
+        }
+        if (t === 'single' || t === 'multiple' || t === 'photo_single' || t === 'photo_multiple') {
+            const list = block.querySelector('.new-options-list');
+            if (list) {
+                list.innerHTML = '';
+                const opts = Array.isArray(item.Options) ? item.Options : [];
+                const normalized = opts
+                    .map(o => ({
+                        text: (o.OptionText || '').trim(),
+                        img: (o.ImageURL || o.image_url || '').trim(),
+                        correct: !!o.IsCorrect
+                    }))
+                    .filter(o => o.text !== '' || o.img !== '');
+                const use = normalized.length >= 2 ? normalized : [{text:'Вариант 1', correct:true}, {text:'Вариант 2', correct:false}];
+
+                use.forEach(o => {
+                    const row = document.createElement('div');
+                    row.className = 'opt-row new-opt-row';
+                    row.innerHTML = `
+                        <div>
+                            <div class="option-text-wrap" style="${isPhoto ? 'display:none;' : ''}">
+                            <label>Текст варианта</label>
+                            <input type="text" class="nq-opt-text" ${isPhoto ? '' : 'required'} placeholder="Введите текст...">
+                            </div>
+
+                            <input type="hidden" class="nq-opt-img" value="">
+                            <div class="option-media" style="display:${isPhoto ? 'flex' : 'none'}; align-items:center; gap:10px; flex-wrap:wrap; margin-top:8px;">
+                                <input type="file" accept="image/*" onchange="uploadNewOptImage(this)">
+                                <img class="opt-preview" style="display:none;">
+                                <button type="button" class="small-btn small-secondary" onclick="clearNewOptImage(this)">Убрать</button>
+                            </div>
+                        </div>
+                        <div class="checkbox" style="margin-top: 26px;">
+                            <input type="checkbox" class="nq-opt-correct">
+                            <span>правильный</span>
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <button type="button" class="small-btn small-secondary" data-delete-option="1">Удалить</button>
+                        </div>
+                    `;
+                    const txt = row.querySelector('.nq-opt-text');
+                    const cb = row.querySelector('.nq-opt-correct');
+                    const imgHidden = row.querySelector('.nq-opt-img');
+                    const img = row.querySelector('img.opt-preview');
+                    if (txt) txt.value = o.text;
+                    if (cb) cb.checked = o.correct;
+                    if (imgHidden) imgHidden.value = o.img;
+                    if (img && o.img) {
+                        img.src = o.img;
+                        img.style.display = 'inline-block';
+                    }
+                    if (cb) cb.addEventListener('change', () => enforceSingleCorrectNew(block, cb));
+                    const del = row.querySelector('button[data-delete-option="1"]');
+                    if (del) del.addEventListener('click', () => {
+                        row.remove();
+                        refreshNewOptionMode(block);
+                        rebuildNewQuestionsPayload();
+                    });
+                    list.appendChild(row);
+                });
+
+                refreshNewOptionMode(block);
+
+                if (t === 'single' || t === 'photo_single') {
+                    const cbs = Array.from(block.querySelectorAll('.new-options-list .nq-opt-correct'));
+                    let seen = false;
+                    cbs.forEach(cb => {
+                        if (cb.checked) {
+                            if (!seen) seen = true;
+                            else cb.checked = false;
+                        }
+                    });
+                    if (!seen && cbs[0]) cbs[0].checked = true;
+                }
+            }
+        }
+
+        rebuildNewQuestionsPayload();
+        closeBankImportEdit();
+    }
+
+
+    function bankCategoryLabel(code) {
+        const c = String(code || 'other').toLowerCase();
+        if (c === 'astronomy') return 'Астрономия';
+        if (c === 'language') return 'Языковые';
+        if (c === 'math') return 'Математика';
+        return 'Другое';
+    }
+
+    function escapeHtmlBank(s) {
+        return String(s)
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
+    function togglePrivateKeyField() {
+        const checked = document.querySelector('input[name="privacy"]:checked');
+        const privacyType = checked ? checked.value : 'public';
+        const privateKeyContainer = document.getElementById('privateKeyContainer');
+        if (privateKeyContainer) {
+            privateKeyContainer.style.display = (privacyType === 'private') ? 'block' : 'none';
+        }
+    }
+
+    function toggleParticipationModeFields() {
+        const modeInput = document.getElementById('participation_mode');
+        const hiddenModeInput = document.getElementById('participation_mode_hidden');
+        const randomTeamAssignmentContainer = document.getElementById('randomTeamAssignmentContainer');
+        const randomTeamAssignmentCheckbox = document.getElementById('random_team_assignment');
+        const teamCountContainer = document.getElementById('teamCountContainer');
+        const teamCountInput = document.getElementById('team_count');
+
+        const mode = modeInput ? modeInput.value : 'individual';
+        const isTeamMode = mode === 'team_manual';
+        const isRandomAssignment = isTeamMode && !!(randomTeamAssignmentCheckbox && randomTeamAssignmentCheckbox.checked);
+
+        if (randomTeamAssignmentContainer) {
+            randomTeamAssignmentContainer.style.display = isTeamMode ? 'block' : 'none';
+        }
+
+        if (teamCountContainer) {
+            teamCountContainer.style.display = isRandomAssignment ? 'block' : 'none';
+        }
+
+        if (hiddenModeInput) {
+            if (isRandomAssignment) {
+                hiddenModeInput.value = 'team_roulette';
+            } else if (isTeamMode) {
+                hiddenModeInput.value = 'team_manual';
+            } else {
+                hiddenModeInput.value = 'individual';
+            }
+        }
+
+        if (randomTeamAssignmentCheckbox && !isTeamMode) {
+            randomTeamAssignmentCheckbox.checked = false;
+        }
+
+        if (teamCountInput) {
+            if (!isRandomAssignment) {
+                teamCountInput.value = '';
+                teamCountInput.required = false;
+                teamCountInput.disabled = true;
+            } else {
+                teamCountInput.disabled = false;
+                if (!teamCountInput.value || Number(teamCountInput.value || '0') < 2) {
+                    teamCountInput.value = '2';
+                }
+                teamCountInput.required = true;
+            }
+        }
+    }
+
+    function formatSecondsToMMSS(totalSeconds) {
+        const n = Number(totalSeconds || 0);
+        if (!Number.isFinite(n) || n <= 0) return '00:00';
+        const total = Math.max(0, Math.floor(n));
+        const mm = Math.floor(total / 60);
+        const ss = total % 60;
+        return String(mm).padStart(2, '0') + ':' + String(ss).padStart(2, '0');
+    }
+
+    function parseMMSS(value) {
+        const raw = String(value || '').trim();
+        if (raw === '') return { ok: true, seconds: 0 };
+        const m = raw.match(/^(\d{1,4})\s*:\s*(\d{1,2})$/);
+        if (!m) return { ok: false, message: 'Введите таймер в формате мм:сс (например, 03:20)' };
+        const mm = Number(m[1]);
+        const ss = Number(m[2]);
+        if (!Number.isInteger(mm) || !Number.isInteger(ss) || ss < 0 || ss > 59) {
+            return { ok: false, message: 'Секунды должны быть в диапазоне 00-59' };
+        }
+        return { ok: true, seconds: mm * 60 + ss };
+    }
+
+    (function initTimeLimitField(){
+        const hidden = document.getElementById('time_limit_seconds');
+        const display = document.getElementById('time_limit_display');
+        const form = document.getElementById('quiz-form') || document.querySelector('form[action^="/edit-quiz"]');
+        if (!hidden || !display) return;
+
+        display.value = formatSecondsToMMSS(hidden.value);
+
+        display.addEventListener('blur', function(){
+            const parsed = parseMMSS(display.value);
+            if (!parsed.ok) return;
+            hidden.value = String(parsed.seconds);
+            display.value = formatSecondsToMMSS(parsed.seconds);
+        });
+
+        if (form) {
+            form.addEventListener('submit', function(e){
+                const parsed = parseMMSS(display.value);
+                if (!parsed.ok) {
+                    e.preventDefault();
+                    alert(parsed.message);
+                    display.focus();
+                    return;
+                }
+                hidden.value = String(parsed.seconds);
+                display.value = formatSecondsToMMSS(parsed.seconds);
+            });
+        }
+    })();
+
+    document.addEventListener('DOMContentLoaded', function () {
+        togglePrivateKeyField();
+        toggleParticipationModeFields();
+        document.querySelectorAll('[id^="existing-question-"]').forEach(el => {
+            const id = parseInt((el.id || '').replace('existing-question-', ''), 10);
+            if (!isNaN(id)) {
+                refreshEditOptionModeForQuestion(id);
+                refreshExistingQuestionTextVisibility(id);
+                refreshExistingOpenAnswerVisibility(id);
+            }
+        });
+        document.querySelectorAll('.new-question-block').forEach(block => {
+            refreshNewQuestionTextVisibility(block);
+            refreshNewOpenAnswerVisibility(block);
+            refreshNewOptionMode(block);
+        });
+    });
+</script>
+</body>
+</html>

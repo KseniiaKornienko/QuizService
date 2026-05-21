@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>QuizHub — Банк вопросов</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .auth-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .logout-btn {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .logout-btn:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        .profile-menu {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .profile-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid rgba(102, 126, 234, 0.25);
+            background: rgba(255, 255, 255, 0.9);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        .profile-btn:hover {
+            transform: translateY(-2px);
+            border-color: rgba(102, 126, 234, 0.45);
+        }
+
+        .profile-btn .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            font-weight: 800;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: calc(100% + 12px);
+            right: 0;
+            width: 240px;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+            overflow: hidden;
+            transform: translateY(-6px);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s ease;
+            z-index: 20;
+        }
+
+        .profile-dropdown.open {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .profile-dropdown .drop-header {
+            padding: 18px 18px 14px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.12), rgba(118, 75, 162, 0.12));
+        }
+
+        .profile-dropdown .hello {
+            font-size: 14px;
+            color: #4a5568;
+            margin-bottom: 4px;
+        }
+
+        .profile-dropdown .drop-body {
+            padding: 12px 10px;
+        }
+
+        .profile-dropdown .drop-item {
+            display: block;
+            padding: 12px 12px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 600;
+            transition: background 0.2s ease;
+        }
+
+        .profile-dropdown .drop-item:hover {
+            background: rgba(102, 126, 234, 0.10);
+        }
+
+        .profile-dropdown .drop-submenu {
+            margin-top: 4px;
+        }
+
+        .profile-dropdown .drop-item-btn {
+            width: 100%;
+            background: transparent;
+            border: none;
+
+            padding: 12px 12px;
+            border-radius: 12px;
+            color: #333;
+            font-weight: 600;
+
+            font-family: inherit;
+            font-size: inherit;
+            line-height: inherit;
+
+            text-align: left;
+            cursor: pointer;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .profile-dropdown .drop-item-btn:hover {
+            background: rgba(102, 126, 234, 0.10);
+        }
+
+        .profile-dropdown .drop-submenu .chev {
+            opacity: 0.7;
+            font-weight: 800;
+            transition: transform 0.2s ease;
+        }
+
+        .profile-dropdown .drop-submenu.open .chev {
+            transform: rotate(180deg);
+        }
+
+        .profile-dropdown .submenu {
+            display: none;
+            padding: 6px 6px 0;
+        }
+
+        .profile-dropdown .drop-submenu.open .submenu {
+            display: block;
+        }
+
+        .profile-dropdown .drop-item.sub-item {
+            padding: 10px 12px;
+            margin-left: 6px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .profile-dropdown .drop-item.sub-item:hover {
+            background: rgba(102, 126, 234, 0.12);
+        }
+
+        .btn {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .25s ease;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: #fff;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.35);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px rgba(102, 126, 234, 0.40);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 18px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 18px;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            color: #1f2937;
+        }
+
+        .muted {
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search {
+            display: flex;
+            gap: 10px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e9e9e9;
+            border-radius: 14px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color .2s ease;
+            background: #fff;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: rgba(102, 126, 234, 0.55);
+        }
+
+        .list {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 72vh;
+            overflow: auto;
+            padding-right: 6px;
+        }
+
+        .item {
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: 16px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.98);
+            cursor: pointer;
+            transition: transform .15s ease, box-shadow .15s ease;
+        }
+
+        .item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
+        }
+
+        .item.active {
+            border-color: rgba(102, 126, 234, 0.55);
+            box-shadow: 0 10px 22px rgba(102, 126, 234, 0.18);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(102, 126, 234, 0.12);
+            color: #374151;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .item-title {
+            font-weight: 800;
+            color: #111827;
+            margin: 6px 0 4px;
+        }
+
+        .item-meta {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .full {
+            grid-column: 1 / -1;
+        }
+
+        .label {
+            display: block;
+            font-weight: 700;
+            color: #374151;
+            font-size: 13px;
+            margin: 8px 0 6px;
+        }
+
+        .opts {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .opt-row {
+            display: grid;
+            grid-template-columns: 1fr 160px 110px;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .opt-row .mini {
+            width: auto;
+        }
+
+        .opt-preview {
+            width: 92px;
+            height: 92px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid rgba(0,0,0,0.08);
+            background: #fff;
+            display: block;
+            flex: 0 0 auto;
+        }
+
+        .mini-btn {
+            padding: 10px 12px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all .2s ease;
+            font-size: 13px;
+        }
+
+        .mini-primary {
+            background: rgba(102, 126, 234, 0.14);
+            color: #2d3748;
+        }
+
+        .mini-primary:hover {
+            background: rgba(102, 126, 234, 0.20);
+        }
+
+        .mini-danger {
+            background: rgba(239, 68, 68, 0.14);
+            color: #7f1d1d;
+        }
+
+        .mini-danger:hover {
+            background: rgba(239, 68, 68, 0.20);
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .status {
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 13px;
+            display: none;
+        }
+
+        @media (max-width: 980px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .list {
+                max-height: 46vh;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <a href="/" class="logo">
+            <div class="logo-icon">Q</div>
+            <div class="logo-text">QuizHub</div>
+        </a>
+
+        <div class="user-menu">
+            <a href="/logout" class="auth-btn logout-btn">Выйти</a>
+            <div class="profile-menu">
+                <button class="profile-btn" id="profileBtn" type="button" aria-haspopup="true" aria-expanded="false">
+                    <div class="avatar">
+                        {{printf "%.1s" .Username}}
+                    </div>
+                </button>
+
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="drop-header">
+                        <div class="hello">Привет, {{.Username}}</div>
+                    </div>
+
+                    <div class="drop-body">
+                        <a class="drop-item" href="/my-quizzes/{{.Username}}">Мои квизы</a>
+                        <a class="drop-item" href="/question-bank/{{.Username}}">Банк вопросов</a>
+                        <a class="drop-item" id="historyLink" href="/history/{{.Username}}">История</a>
+                        <div class="drop-submenu" id="profileSettings">
+                            <button class="drop-item drop-item-btn" id="profileSettingsBtn" type="button"
+                                    aria-haspopup="true" aria-expanded="false">
+                                <span>Настройки профиля</span>
+                                <span class="chev">▾</span>
+                            </button>
+
+                            <div class="submenu" id="profileSettingsMenu">
+                                <a class="drop-item sub-item" href="/profile/change-username">Изменить имя пользователя</a>
+                                <a class="drop-item sub-item" href="/profile/change-password">Изменить пароль</a>
+                            </div>
+                        </div>
+                        <a class="drop-item" href="/logout">Выйти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="grid">
+        <div class="card">
+            <div class="row" style="justify-content:space-between;">
+                <div>
+                    <h2>Банк вопросов</h2>
+                    <div class="muted">Сохраненные вопросы можно импортировать в квизы
+                    </div>
+                </div>
+                <button class="btn btn-primary" type="button" onclick="startCreate()">+ Новый вопрос</button>
+            </div>
+
+            <div class="search" style="margin-top: 12px;">
+                <input id="qSearch" type="text" placeholder="Поиск по тексту..." oninput="renderList()">
+                <select id="catFilter" onchange="renderList()" style="min-width: 220px;">
+                    <option value="">Все категории</option>
+                    <option value="astronomy">Астрономия</option>
+                    <option value="language">Языковые</option>
+                    <option value="math">Математика</option>
+                </select>
+            </div>
+            <div id="list" class="list"></div>
+        </div>
+
+        <div class="card">
+            <h2 id="editorTitle">Новый вопрос</h2>
+            <div class="form-grid">
+                <div class="full">
+                    <label class="label">Текст вопроса</label>
+                    <textarea id="qText" rows="3" placeholder="Введите текст вопроса..."></textarea>
+                </div>
+
+                <div>
+                    <label class="label">Баллы</label>
+                    <input id="qPoints" type="number" min="0" value="1">
+                </div>
+                <div>
+                    <label class="label">Тип</label>
+                    <select id="qType" onchange="syncTypeUI()">
+                        <option value="single">Одиночный выбор</option>
+                        <option value="multiple">Множественный выбор</option>
+                        <option value="open">Открытый ответ</option>
+                        <option value="photo_single">Фото-одиночный выбор</option>
+                        <option value="photo_multiple">Фото-множественный выбор</option>
+                        <option value="video">Видео</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="label">Категория</label>
+                    <select id="qCategory">
+                        <option value="astronomy">Астрономия</option>
+                        <option value="language">Языковые</option>
+                        <option value="math">Математика</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="qImageBlock" style="margin-top:12px;">
+                <div class="label" style="margin:0 0 8px 0;">Добавить медиа (необязательно)</div>
+                <input id="qImageUrl" type="hidden" value="">
+                <input id="qMediaType" type="hidden" value="">
+                <div class="row" style="justify-content:flex-start; gap:10px; flex-wrap:wrap;">
+                    <input id="qImageFile" type="file" accept="image/*,video/*" onchange="uploadBankQuestionImage(this)">
+                    <img id="qImagePreview" class="opt-preview" src="" style="display:none; max-width:280px; max-height:180px; width:auto; height:auto;">
+                    <video id="qVideoPreview" controls style="display:none; max-width:280px; max-height:180px; width:auto; height:auto; border-radius:14px;"></video>
+                    <button class="mini-btn" type="button" onclick="clearBankQuestionImage()">Убрать</button>
+                </div>
+            </div>
+
+            <div id="optsBlock" style="margin-top:12px;">
+                <div class="row" style="justify-content:space-between; margin-top: 8px;">
+                    <div>
+                        <div class="label" style="margin:0;">Варианты ответов</div>
+                    </div>
+                    <button class="mini-btn mini-primary" type="button" onclick="addOptionRow('')">+ Вариант</button>
+                </div>
+                <div id="opts" class="opts"></div>
+            </div>
+
+            <div id="openAnswersBlock" style="margin-top:12px; display:none;">
+                <label class="label" for="qOpenAnswers">Варианты ответов</label>
+                <textarea id="qOpenAnswers" rows="4" placeholder="Каждый ответ с новой строки"></textarea>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-primary" type="button" onclick="saveQuestion()">Сохранить</button>
+                <button class="btn btn-secondary" type="button" onclick="resetEditor()">Сбросить</button>
+                <button id="deleteBtn" class="btn btn-secondary" type="button" onclick="deleteQuestion()"
+                        style="display:none;">Удалить
+                </button>
+            </div>
+            <div id="status" class="status"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let allItems = [];
+    let activeId = 0;
+    let bankBulkOptionsRender = false;
+
+    (function () {
+        const btn = document.getElementById('profileBtn');
+        const dd = document.getElementById('profileDropdown');
+
+        const settingsWrap = document.getElementById('profileSettings');
+        const settingsBtn = document.getElementById('profileSettingsBtn');
+
+        if (!btn || !dd) return;
+
+        const close = () => {
+            dd.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
+            if (settingsWrap) settingsWrap.classList.remove('open');
+        };
+
+        const toggle = () => {
+            const isOpen = dd.classList.contains('open');
+            if (isOpen) close();
+            else {
+                dd.classList.add('open');
+                btn.setAttribute('aria-expanded', 'true');
+            }
+        };
+
+        btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            toggle();
+        });
+
+        dd.addEventListener('click', function (e) {
+            e.stopPropagation();
+        });
+
+        if (settingsBtn && settingsWrap) {
+            settingsBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                settingsWrap.classList.toggle('open');
+            });
+        }
+
+        document.addEventListener('click', function () {
+            close();
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') close();
+        });
+    })();
+
+    function apiFetch(url, opts) {
+        const o = opts || {};
+        o.headers = Object.assign({}, o.headers || {}, {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        });
+        return fetch(url, o).then(r => r.json());
+    }
+
+    function showStatus(ok, msg) {
+        const el = document.getElementById('status');
+        el.className = 'status ' + (ok ? 'ok' : 'err');
+        el.textContent = msg;
+        el.style.display = 'block';
+    }
+
+    function clearStatus() {
+        const el = document.getElementById('status');
+        el.className = 'status';
+        el.textContent = '';
+        el.style.display = 'none';
+    }
+
+    function prettyType(t) {
+        if (t === 'single') return 'single';
+        if (t === 'multiple') return 'multiple';
+        if (t === 'open') return 'open';
+        if (t === 'photo_single') return 'photo_single';
+        if (t === 'photo_multiple') return 'photo_multiple';
+        if (t === 'photo') return 'photo';
+        if (t === 'video') return 'video';
+        return t || '';
+    }
+
+    function prettyCategory(c) {
+        if (c === 'astronomy') return 'Астрономия';
+        if (c === 'language') return 'Языковые';
+        if (c === 'math') return 'Математика';
+    }
+
+    function mediaTypeFromValue(type, url) {
+        const t = String(type || '').trim().toLowerCase();
+        if (t === 'video') return 'video';
+        if (t === 'image' || t === 'photo') return 'image';
+        const cleanUrl = String(url || '').trim().split(/[?#]/)[0].toLowerCase();
+        if (cleanUrl.endsWith('.mp4') || cleanUrl.endsWith('.webm') || cleanUrl.endsWith('.ogg') || cleanUrl.endsWith('.mov') || cleanUrl.endsWith('.m4v')) return 'video';
+        return cleanUrl ? 'image' : '';
+    }
+
+    function renderBankQuestionMediaPreview(url, type) {
+        const mediaUrl = String(url || '').trim();
+        const mediaType = mediaTypeFromValue(type, mediaUrl);
+        const hiddenUrl = document.getElementById('qImageUrl');
+        const hiddenType = document.getElementById('qMediaType');
+        const img = document.getElementById('qImagePreview');
+        const video = document.getElementById('qVideoPreview');
+        if (hiddenUrl) hiddenUrl.value = mediaUrl;
+        if (hiddenType) hiddenType.value = mediaType;
+        if (!img || !video) return;
+
+        if (!mediaUrl) {
+            img.src = '';
+            img.style.display = 'none';
+            video.pause();
+            video.removeAttribute('src');
+            video.load();
+            video.style.display = 'none';
+            return;
+        }
+
+        if (mediaType === 'video') {
+            img.src = '';
+            img.style.display = 'none';
+            video.src = mediaUrl;
+            video.style.display = 'inline-block';
+        } else {
+            video.pause();
+            video.removeAttribute('src');
+            video.load();
+            video.style.display = 'none';
+            img.src = mediaUrl;
+            img.style.display = 'inline-block';
+        }
+    }
+
+    function loadList() {
+        return apiFetch('/question-bank/?action=list').then(res => {
+            if (!res.ok) {
+                showStatus(false, res.error || 'Ошибка загрузки');
+                return;
+            }
+            allItems = res.items || [];
+            renderList();
+        }).catch(() => showStatus(false, 'Ошибка сети'));
+    }
+
+    function renderList() {
+        const q = (document.getElementById('qSearch').value || '').trim().toLowerCase();
+        const cat = (document.getElementById('catFilter')?.value || '').trim();
+        const list = document.getElementById('list');
+        list.innerHTML = '';
+
+        const filtered = allItems.filter(it => {
+            const text = (it.Question?.Text || '').toLowerCase();
+            const c = (it.Question?.Category || 'other');
+            const okText = (q === '' || text.includes(q));
+            const okCat = (cat === '' || c === cat);
+            return okText && okCat;
+        });
+
+        if (filtered.length === 0) {
+            const div = document.createElement('div');
+            div.className = 'muted';
+            div.style.padding = '10px 2px';
+            div.textContent = 'Пока нет вопросов. Нажмите “Новый вопрос”.';
+            list.appendChild(div);
+            return;
+        }
+
+        filtered.forEach(it => {
+            const id = it.Question?.Id || 0;
+            const el = document.createElement('div');
+            el.className = 'item' + (id === activeId ? ' active' : '');
+            el.onclick = () => openItem(id);
+            el.innerHTML = `
+                <div class="item-meta">
+                    <span class="badge">${prettyType(it.Question?.Type)}</span>
+                    <span class="badge">${prettyCategory(it.Question?.Category || 'other')}</span>
+                    <span class="badge">${it.Question?.Points ?? 0} балл(ов)</span>
+                </div>
+                <div class="item-title">${escapeHtml((it.Question?.Text || '').slice(0, 140) || '(без текста)')}</div>
+            `;
+            list.appendChild(el);
+        });
+    }
+
+    function openItem(id) {
+        clearStatus();
+        activeId = id;
+        renderList();
+        apiFetch('/question-bank/?action=get&id=' + encodeURIComponent(String(id))).then(res => {
+            if (!res.ok) {
+                showStatus(false, res.error || 'Не удалось открыть вопрос');
+                return;
+            }
+            fillEditor(res.item);
+        }).catch(() => showStatus(false, 'Ошибка сети'));
+    }
+
+    function resetEditor() {
+        activeId = 0;
+        document.getElementById('editorTitle').textContent = 'Новый вопрос';
+        document.getElementById('qText').value = '';
+        document.getElementById('qPoints').value = '1';
+        document.getElementById('qType').value = 'single';
+        document.getElementById('qCategory').value = 'other';
+        document.getElementById('qOpenAnswers').value = '';
+        renderBankQuestionMediaPreview('', '');
+        const qImgFile = document.getElementById('qImageFile'); if (qImgFile) qImgFile.value = '';
+        document.getElementById('opts').innerHTML = '';
+        bankBulkOptionsRender = true;
+        document.getElementById('deleteBtn').style.display = 'none';
+        syncTypeUI();
+        bankBulkOptionsRender = false;
+        clearStatus();
+        renderList();
+    }
+
+    function startCreate() {
+        resetEditor();
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    function fillEditor(item) {
+        const q = item?.Question || {};
+        document.getElementById('editorTitle').textContent = 'Редактирование вопроса';
+        document.getElementById('qText').value = q.Text || '';
+        document.getElementById('qPoints').value = String(q.Points ?? 0);
+        document.getElementById('qType').value = q.Type || 'single';
+        document.getElementById('qCategory').value = q.Category || 'other';
+        document.getElementById('qOpenAnswers').value = item.OpenAnswersText || '';
+        renderBankQuestionMediaPreview(q.QuestionMediaURL || q.QuestionImageURL || '', q.QuestionMediaType || '');
+        const qImgFile = document.getElementById('qImageFile'); if (qImgFile) qImgFile.value = '';
+        document.getElementById('deleteBtn').style.display = 'inline-block';
+
+        const opts = document.getElementById('opts');
+        opts.innerHTML = '';
+        bankBulkOptionsRender = true;
+        (item.Options || []).forEach(o => addOptionRow(o.OptionText || '', !!o.IsCorrect, o.ImageURL || ''));
+        bankBulkOptionsRender = false;
+        if (q.Type === 'single' || q.Type === 'multiple' || q.Type === 'photo_single' || q.Type === 'photo_multiple') {
+            while (document.querySelectorAll('#opts .opt-row').length < 2) addOptionRow('', false, '');
+        }
+        if (q.Type === 'open' && !document.getElementById('qOpenAnswers').value) {
+            const fallbackAnswers = Array.isArray(item.Options)
+                ? item.Options
+                    .filter(o => !!o.IsCorrect && String(o.OptionText || '').trim() !== '')
+                    .map(o => String(o.OptionText || '').trim())
+                : [];
+            document.getElementById('qOpenAnswers').value = fallbackAnswers.join('\n');
+        }
+        syncTypeUI();
+    }
+
+    function isPhotoBankType(t) {
+        return t === 'photo_single' || t === 'photo_multiple';
+    }
+
+    function isChoiceBankType(t) {
+        return t === 'single' || t === 'multiple' || isPhotoBankType(t);
+    }
+
+    function collectOpenAnswersFromEditor() {
+        const raw = (document.getElementById('qOpenAnswers')?.value || '');
+        const seen = new Set();
+        const answers = [];
+        raw.split(/\r?\n/).forEach(line => {
+            const text = String(line || '').trim();
+            const normalized = text.toLowerCase().replaceAll('ё', 'е').replace(/\s+/g, ' ').trim();
+            if (!normalized || seen.has(normalized)) return;
+            seen.add(normalized);
+            answers.push(text);
+        });
+        return answers;
+    }
+
+    function syncBankOptionMode() {
+        const t = document.getElementById('qType').value;
+        const isPhoto = isPhotoBankType(t);
+        const rows = Array.from(document.querySelectorAll('#opts .opt-row'));
+        rows.forEach((row, idx) => {
+            const txt = row.querySelector('.opt-text');
+            let num = row.querySelector('.opt-num');
+            if (!num) {
+                num = document.createElement('div');
+                num.className = 'opt-num';
+                num.style.fontWeight = '700';
+                num.style.marginBottom = '8px';
+                num.style.display = 'none';
+                const firstCol = row.querySelector('div');
+                if (firstCol) firstCol.insertBefore(num, firstCol.firstChild);
+            }
+            if (num) {
+                num.textContent = 'Вариант ' + (idx + 1);
+                num.style.display = isPhoto ? 'block' : 'none';
+            }
+            if (txt) {
+                txt.required = !isPhoto;
+                txt.style.display = isPhoto ? 'none' : '';
+                if (!isPhoto) txt.placeholder = 'Текст варианта';
+            }
+            const mediaRow = row.querySelector('.opt-media-row');
+            if (mediaRow) mediaRow.style.display = isPhoto ? 'flex' : 'none';
+            const visualRadio = row.querySelector('.opt-correct-radio');
+            const chk = row.querySelector('.opt-correct');
+            const txtLbl = row.querySelector('.opt-correct-text');
+            if (visualRadio && chk) {
+                const isSingle = (t === 'single' || t === 'photo_single');
+                visualRadio.style.display = isSingle ? '' : 'none';
+                chk.style.display = isSingle ? 'none' : '';
+                visualRadio.checked = !!chk.checked;
+                if (txtLbl) txtLbl.textContent = 'правильный';
+            }
+        });
+    }
+
+    function syncTypeUI() {
+        const t = document.getElementById('qType').value;
+        const block = document.getElementById('optsBlock');
+        const openBlock = document.getElementById('openAnswersBlock');
+        const qImageBlock = document.getElementById('qImageBlock');
+        if (qImageBlock) qImageBlock.style.display = 'block';
+        const needOpts = isChoiceBankType(t);
+        const needOpenAnswers = t === 'open';
+        block.style.display = needOpts ? 'block' : 'none';
+        if (openBlock) openBlock.style.display = needOpenAnswers ? 'block' : 'none';
+
+        if (needOpts) {
+            const opts = document.getElementById('opts');
+            while (opts.children.length < 2) addOptionRow('', false, '');
+        } else {
+            document.getElementById('opts').innerHTML = '';
+        }
+
+        syncBankOptionMode();
+        if (t === 'single' || t === 'photo_single') enforceSingleCorrect();
+    }
+
+    function countImagesBank() {
+        const h = document.querySelectorAll('#opts .opt-img');
+        let c = 0;
+        h.forEach(x => { if ((x.value || '').trim() !== '') c++; });
+        return c;
+    }
+
+    async function uploadBankOptImage(fileInput) {
+        const file = fileInput.files && fileInput.files[0];
+        if (!file) return;
+        const row = fileInput.closest('.opt-row');
+        const hidden = row ? row.querySelector('.opt-img') : null;
+        const hadBefore = hidden && (hidden.value || '').trim() !== '';
+        if (!hadBefore && countImagesBank() >= 4) {
+            alert('Можно добавить максимум 4 картинки на вопрос');
+            fileInput.value = '';
+            return;
+        }
+        const fd = new FormData();
+        fd.append('file', file);
+        try {
+            const resp = await fetch('/api/upload-option-image', { method: 'POST', body: fd });
+            const data = await resp.json();
+            if (!data || !data.ok) {
+                alert((data && data.error) ? data.error : 'Не удалось загрузить картинку');
+                fileInput.value = '';
+                return;
+            }
+            if (hidden) hidden.value = data.url;
+            const img = row ? row.querySelector('img.opt-preview') : null;
+            if (img) {
+                img.src = data.url;
+                img.style.display = 'inline-block';
+            }
+        } catch (e) {
+            alert('Ошибка загрузки картинки');
+            fileInput.value = '';
+        }
+    }
+
+
+    async function uploadBankQuestionImage(fileInput) {
+        const file = fileInput.files && fileInput.files[0];
+        if (!file) return;
+        const fd = new FormData();
+        fd.append('file', file);
+        try {
+            const resp = await fetch('/api/upload-question-media', { method: 'POST', body: fd });
+            const data = await resp.json();
+            if (!data || !data.ok || !data.url) {
+                alert((data && data.error) ? data.error : 'Не удалось загрузить медиа');
+                fileInput.value = '';
+                return;
+            }
+            renderBankQuestionMediaPreview(data.url || '', data.media_type || 'image');
+        } catch (e) {
+            alert('Ошибка загрузки медиа');
+            fileInput.value = '';
+        }
+    }
+
+    function clearBankQuestionImage() {
+        renderBankQuestionMediaPreview('', '');
+        const fi = document.getElementById('qImageFile');
+        if (fi) fi.value = '';
+    }
+
+    function clearBankOptImage(btn) {
+        const row = btn.closest('.opt-row');
+        if (!row) return;
+        const hidden = row.querySelector('.opt-img');
+        if (hidden) hidden.value = '';
+        const img = row.querySelector('img.opt-preview');
+        if (img) { img.src = ''; img.style.display = 'none'; }
+        const fi = row.querySelector('input[type="file"]');
+        if (fi) fi.value = '';
+    }
+
+    function addOptionRow(text, isCorrect, imageUrl) {
+        const opts = document.getElementById('opts');
+        const row = document.createElement('div');
+        row.className = 'opt-row';
+        row.innerHTML = `
+            <div>
+                <input type="text" class="opt-text" placeholder="Текст варианта" value="${escapeAttr(text || '')}">
+
+                <input type="hidden" class="opt-img" value="${escapeAttr(imageUrl || '')}">
+                <div class="row opt-media-row" style="justify-content:flex-start; gap:10px; margin-top:8px; flex-wrap:wrap;">
+                    <input type="file" accept="image/*" onchange="uploadBankOptImage(this)">
+                    <img class="opt-preview" src="${escapeAttr(imageUrl || '')}" ${imageUrl ? '' : 'style="display:none;"'}>
+                    <button class="mini-btn" type="button" onclick="clearBankOptImage(this)">Убрать</button>
+                </div>
+            </div>
+            <div class="row" style="justify-content:flex-start; gap:10px;">
+                <label class="row" style="gap:10px; font-weight:800; color:#374151;">
+                    <input type="radio" class="opt-correct-radio" name="bankCorrectVisual" ${isCorrect ? 'checked' : ''} onchange="onCorrectChanged(this)" style="display:none;">
+                    <input type="checkbox" class="opt-correct" ${isCorrect ? 'checked' : ''} onchange="onCorrectChanged(this)">
+                    <span class="opt-correct-text">правильный</span>
+                </label>
+            </div>
+            <div>
+                <button class="mini-btn mini-danger" type="button" onclick="removeOptionRow(this)">Удалить</button>
+            </div>
+        `;
+        opts.appendChild(row);
+        if (!bankBulkOptionsRender) enforceMinOptions();
+        syncBankOptionMode();
+        enforceSingleCorrect();
+    }
+
+    function removeOptionRow(btn) {
+        const row = btn.closest('.opt-row');
+        if (row) row.remove();
+        enforceMinOptions();
+        syncBankOptionMode();
+        enforceSingleCorrect();
+    }
+
+    function enforceMinOptions() {
+        const t = document.getElementById('qType').value;
+        if (!isChoiceBankType(t)) return;
+        const rows = Array.from(document.querySelectorAll('#opts .opt-row'));
+        if (rows.length >= 2) return;
+        while (document.querySelectorAll('#opts .opt-row').length < 2) addOptionRow('', false, '');
+    }
+
+    function onCorrectChanged(el) {
+        const t = document.getElementById('qType').value;
+        if (el && el.classList && el.classList.contains('opt-correct-radio')) {
+            if (t === 'single' || t === 'photo_single') {
+                const rows = Array.from(document.querySelectorAll('#opts .opt-row'));
+                rows.forEach(r => {
+                    const rRadio = r.querySelector('.opt-correct-radio');
+                    const rChk = r.querySelector('.opt-correct');
+                    const isThis = (rRadio === el) && !!el.checked;
+                    if (rRadio) rRadio.checked = isThis;
+                    if (rChk) rChk.checked = isThis;
+                });
+            } else {
+                const row = el.closest('.opt-row');
+                const chk = row ? row.querySelector('.opt-correct') : null;
+                if (chk) chk.checked = !!el.checked;
+            }
+        } else if (el && el.classList && el.classList.contains('opt-correct')) {
+            const row = el.closest('.opt-row');
+            const radio = row ? row.querySelector('.opt-correct-radio') : null;
+            if (radio) radio.checked = !!el.checked;
+        }
+
+        if (t === 'single' || t === 'photo_single') enforceSingleCorrect();
+        syncBankOptionMode();
+    }
+
+    function enforceSingleCorrect() {
+        const t = document.getElementById('qType').value;
+        if (t !== 'single' && t !== 'photo_single') return;
+        const boxes = Array.from(document.querySelectorAll('#opts .opt-correct'));
+        const checked = boxes.filter(b => b.checked);
+        if (checked.length <= 1) {
+            if (checked.length === 0 && boxes.length > 0) boxes[0].checked = true;
+            return;
+        }
+        const keep = checked[checked.length - 1];
+        boxes.forEach(b => {
+            if (b !== keep) b.checked = false;
+        });
+        document.querySelectorAll('#opts .opt-row').forEach(row => {
+            const chk = row.querySelector('.opt-correct');
+            const radio = row.querySelector('.opt-correct-radio');
+            if (chk && radio) radio.checked = !!chk.checked;
+        });
+    }
+
+    function collectPayload() {
+        const text = (document.getElementById('qText').value || '').trim();
+        const points = parseInt(document.getElementById('qPoints').value || '0', 10) || 0;
+        const type = document.getElementById('qType').value;
+        const category = document.getElementById('qCategory')?.value || 'other';
+
+        const payload = {
+            action: activeId ? 'update' : 'create',
+            id: activeId,
+            text,
+            question_media_url: (document.getElementById('qImageUrl')?.value || '').trim(),
+            question_media_type: (document.getElementById('qMediaType')?.value || '').trim(),
+            category,
+            type,
+            points,
+            options: []
+        };
+
+        if (isChoiceBankType(type)) {
+            const rows = Array.from(document.querySelectorAll('#opts .opt-row'));
+            rows.forEach(r => {
+                const t = (r.querySelector('.opt-text')?.value || '').trim();
+                const img = (r.querySelector('.opt-img')?.value || '').trim();
+                const c = !!r.querySelector('.opt-correct')?.checked;
+                if (t !== '' || img !== '') payload.options.push({text: t, image_url: img, is_correct: c});
+            });
+        } else if (type === 'open') {
+            collectOpenAnswersFromEditor().forEach(answer => {
+                payload.options.push({text: answer, image_url: '', is_correct: true});
+            });
+        }
+        return payload;
+    }
+
+    function validatePayload(p) {
+        if (!p.text) return 'Введите текст вопроса.';
+        if (p.points < 0) return 'Баллы не могут быть отрицательными.';
+        const mediaUrl = (p.question_media_url || p.question_image_url || '').trim();
+        const mediaType = mediaTypeFromValue(p.question_media_type || '', mediaUrl);
+        if (p.type === 'photo' && !mediaUrl) return 'Для фото-вопроса загрузите изображение.';
+        if (p.type === 'video' && !mediaUrl) return 'Для видео-вопроса загрузите видео.';
+        if (p.type === 'photo' && mediaUrl && mediaType !== 'image') return 'Для фото-вопроса нужно изображение.';
+        if (p.type === 'video' && mediaUrl && mediaType !== 'video') return 'Для видео-вопроса нужно видео.';
+        if (isChoiceBankType(p.type)) {
+            if ((p.options || []).length < 2) return 'Для вопросов с вариантами нужно минимум 2 варианта ответа.';
+            const anyCorrect = (p.options || []).some(o => o.is_correct);
+            if (!anyCorrect) return 'Отметьте хотя бы один правильный вариант.';
+            if (p.type === 'single' || p.type === 'photo_single') {
+                const cnt = (p.options || []).filter(o => o.is_correct).length;
+                if (cnt !== 1) return 'Для single должен быть ровно один правильный вариант.';
+            }
+        }
+        if (p.type === 'open' && (p.options || []).length === 0) {
+            return 'Для открытого вопроса укажите хотя бы один правильный ответ.';
+        }
+        return '';
+    }
+
+    function saveQuestion() {
+        clearStatus();
+        const p = collectPayload();
+        const err = validatePayload(p);
+        if (err) {
+            showStatus(false, err);
+            return;
+        }
+
+        apiFetch('/question-bank/', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(p)
+        }).then(res => {
+            if (!res.ok) {
+                showStatus(false, res.error || 'Ошибка сохранения');
+                return;
+            }
+            showStatus(true, 'Сохранено');
+            return loadList().then(() => {
+                if (!activeId && res.id) {
+                    activeId = parseInt(res.id, 10) || 0;
+                    renderList();
+                    openItem(activeId);
+                } else {
+                    renderList();
+                }
+            });
+        }).catch(() => showStatus(false, 'Ошибка сети'));
+    }
+
+    function deleteQuestion() {
+        if (!activeId) return;
+        if (!confirm('Удалить вопрос из банка?')) return;
+        clearStatus();
+
+        apiFetch('/question-bank/', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({action: 'delete', id: activeId})
+        }).then(res => {
+            if (!res.ok) {
+                showStatus(false, res.error || 'Ошибка удаления');
+                return;
+            }
+            showStatus(true, 'Удалено');
+            activeId = 0;
+            return loadList().then(() => resetEditor());
+        }).catch(() => showStatus(false, 'Ошибка сети'));
+    }
+    function escapeHtml(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function escapeAttr(s) {
+        return escapeHtml(s);
+    }
+    resetEditor();
+    loadList();
+</script>
+</body>
+</html>
