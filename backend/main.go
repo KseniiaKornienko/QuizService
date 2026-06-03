@@ -26,7 +26,6 @@ func main() {
 	db.SetMaxIdleConns(25)
 	db.SetConnMaxIdleTime(2 * time.Minute)
 	db.SetConnMaxLifetime(10 * time.Minute)
-
 	http.HandleFunc("/", handleHomePage)
 	http.HandleFunc("/register", handleRegister)
 	http.HandleFunc("/login", handleLogin)
@@ -34,6 +33,7 @@ func main() {
 	http.HandleFunc("/quiz/", handleViewQuiz)
 	http.HandleFunc("/my-quizzes/", handleMyQuizzes)
 	http.HandleFunc("/edit-quiz", handleEditQuiz)
+	http.HandleFunc("/edit-quiz/", handleEditQuiz)
 	http.HandleFunc("/delete-quiz/", handleDeleteQuiz)
 	http.HandleFunc("/question-bank/", handleQuestionsBank)
 	http.HandleFunc("/history/", handleHistory)
