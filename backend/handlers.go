@@ -364,13 +364,17 @@ func buildQuizTeamLeaderboard(quizID int, currentTeam string, rouletteMode bool)
 	teams := make(map[string]*teamAgg)
 
 	for rows.Next() {
-		var userID int
+		var userIDValue sql.NullInt64
 		var rawTeamName string
 		var teamNumber sql.NullInt64
 		var score int
 		var participantName string
-		if err := rows.Scan(&userID, &rawTeamName, &teamNumber, &score, &participantName); err != nil {
+		if err := rows.Scan(&userIDValue, &rawTeamName, &teamNumber, &score, &participantName); err != nil {
 			return nil, 0, err
+		}
+		userID := 0
+		if userIDValue.Valid {
+			userID = int(userIDValue.Int64)
 		}
 
 		teamName := ""
@@ -1152,11 +1156,7 @@ func handleViewQuiz(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID, ok := getUserID(r)
-	if !ok {
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
-		return
-	}
+	userID, _ := getUserID(r)
 
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, "Некорректные данные формы", http.StatusBadRequest)
@@ -1281,7 +1281,7 @@ func handleViewQuiz(w http.ResponseWriter, r *http.Request) {
 		_ = db.QueryRow(`SELECT COALESCE(MAX(attempt_number), 0) + 1
 			FROM quiz_sessions
 			WHERE quiz_id = ? AND LOWER(TRIM(participant_name)) = ?`, quizID, name).Scan(&attempt)
-	} else {
+	} else if userID > 0 {
 		_ = db.QueryRow("SELECT COALESCE(MAX(attempt_number), 0) + 1 FROM quiz_sessions WHERE quiz_id = ? AND user_id = ?", quizID, userID).Scan(&attempt)
 	}
 
@@ -1548,9 +1548,10 @@ func handleViewQuiz(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Ошибка базы данных", http.StatusInternalServerError)
 	}
 
+	sessionUserID := sql.NullInt64{Int64: int64(userID), Valid: userID > 0}
 	res, err := tx.Exec(
 		"INSERT INTO quiz_sessions (quiz_id, user_id, participant_name, team_name, team_number, attempt_number, started_at, finished_at, score, max_score) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-		quizID, userID, participantName, sql.NullString{String: teamName, Valid: teamName != ""}, sql.NullInt64{Int64: int64(teamNumber), Valid: teamNumber > 0}, attempt, startedAt, finishedAt, score, maxScore,
+		quizID, sessionUserID, participantName, sql.NullString{String: teamName, Valid: teamName != ""}, sql.NullInt64{Int64: int64(teamNumber), Valid: teamNumber > 0}, attempt, startedAt, finishedAt, score, maxScore,
 	)
 	if err != nil {
 		failSubmitDB("Не удалось создать quiz_session", err)
@@ -1752,20 +1753,6 @@ func handleMyQuizzes(w http.ResponseWriter, r *http.Request) {
 	} else {
 		fmt.Fprintf(w, "Страница не найдена")
 	}
-}
-
-type editQuizPageData struct {
-	Username      string
-	Quiz          quiz
-	Questions     []QuestionWithOptions
-	ExistingCount int
-	IsNew         bool
-}
-
-type quizFormOption struct {
-	text      string
-	imageURL  string
-	isCorrect bool
 }
 
 func defaultNewQuiz() quiz {
@@ -2779,91 +2766,6 @@ func handleDeleteQuiz(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type quizStatsSummary struct {
-	QuizID            int
-	Title             string
-	LastStartedAt     string
-	LastFinishedAt    string
-	AttemptsTotal     int
-	ParticipantsTotal int
-	AvgScore          float64
-	AvgMaxScore       float64
-	TeamsTotal        int
-}
-
-type quizStatsOptionDist struct {
-	OptionID       int
-	OptionText     string
-	OptionImageURL string
-	Count          int
-	Percent        float64
-	IsCorrect      bool
-}
-
-type quizStatsQuestion struct {
-	Index             int
-	QuestionID        int
-	Text              string
-	Type              string
-	Points            int
-	QuestionMediaURL  string
-	QuestionMediaType string
-	Total             int
-	Correct           int
-	CorrectPct        float64
-	HasAutoCheck      bool
-	Options           []quizStatsOptionDist
-	AcceptedAnswers   []string
-	SkippedCount      int
-	SkippedPct        float64
-}
-
-type quizStatsParticipantRow struct {
-	SessionID       int64
-	UserID          int
-	ParticipantName string
-	TeamName        string
-	AttemptNumber   int
-	StartedAt       string
-	FinishedAt      string
-	DurationHuman   string
-	DurationSecond  int
-	Score           int
-	MaxScore        int
-}
-
-type quizStatsAnswerRow struct {
-	SessionID          int64
-	ParticipantName    string
-	TeamName           string
-	AttemptNumber      int
-	QuestionIndex      int
-	QuestionID         int
-	QuestionText       string
-	QuestionType       string
-	SelectedOptionID   int
-	SelectedOptionText string
-	AnswerText         string
-	IsCorrectKnown     bool
-	IsCorrect          bool
-}
-
-type quizStatsReportData struct {
-	Username        string
-	Quiz            quiz
-	Summary         quizStatsSummary
-	Participants    []quizStatsParticipantRow
-	Answers         []quizStatsAnswerRow
-	Questions       []quizStatsQuestion
-	TeamLeaderboard []TeamStanding
-}
-
-type quizStatsLoadError struct {
-	Status  int
-	Message string
-	Err     error
-}
-
 func (e quizStatsLoadError) Error() string {
 	if e.Err != nil {
 		return e.Err.Error()
@@ -3007,9 +2909,13 @@ func loadQuizStatsReport(currentUsername string, quizID int, attemptsLimit int, 
 	participants := make([]quizStatsParticipantRow, 0, 64)
 	for rows.Next() {
 		var pr quizStatsParticipantRow
+		var userIDValue sql.NullInt64
 		var st, ft time.Time
-		if err := rows.Scan(&pr.SessionID, &pr.UserID, &pr.ParticipantName, &pr.TeamName, &pr.AttemptNumber, &st, &ft, &pr.Score, &pr.MaxScore); err != nil {
+		if err := rows.Scan(&pr.SessionID, &userIDValue, &pr.ParticipantName, &pr.TeamName, &pr.AttemptNumber, &st, &ft, &pr.Score, &pr.MaxScore); err != nil {
 			return data, quizStatsLoadError{Status: http.StatusInternalServerError, Message: "Ошибка базы данных", Err: err}
+		}
+		if userIDValue.Valid {
+			pr.UserID = int(userIDValue.Int64)
 		}
 		pr.StartedAt = st.Format("2006-01-02 15:04:05")
 		pr.FinishedAt = ft.Format("2006-01-02 15:04:05")
@@ -3310,19 +3216,6 @@ func exportQuizStatsExcel(w http.ResponseWriter, r *http.Request, currentUsernam
 	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, filename))
 	w.Header().Set("Content-Length", strconv.Itoa(len(fileBytes)))
 	_, _ = w.Write(fileBytes)
-}
-
-type xlsxCell struct {
-	Value any
-	Style int
-}
-
-type xlsxSheet struct {
-	Name       string
-	Rows       [][]xlsxCell
-	Widths     []float64
-	FreezePane bool
-	AutoFilter bool
 }
 
 func xlsxHeader(value string) xlsxCell {
@@ -3885,7 +3778,7 @@ func renderQuizParticipantStats(w http.ResponseWriter, r *http.Request, currentU
 		http.Error(w, "Доступ запрещён", http.StatusForbidden)
 		return
 	}
-	var userID int
+	var userIDValue sql.NullInt64
 	var participantName string
 	var teamName string
 	var attempt int
@@ -3904,7 +3797,7 @@ func renderQuizParticipantStats(w http.ResponseWriter, r *http.Request, currentU
 		FROM quiz_sessions qs
 		LEFT JOIN users u ON u.id = qs.user_id
 		WHERE qs.id = ? AND qs.quiz_id = ?`, sessionID, quizID,
-	).Scan(&userID, &participantName, &teamName, &attempt, &startedAt, &finishedAt, &score, &maxScore)
+	).Scan(&userIDValue, &participantName, &teamName, &attempt, &startedAt, &finishedAt, &score, &maxScore)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			http.NotFound(w, r)
